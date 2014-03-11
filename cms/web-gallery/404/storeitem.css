@@ -1,0 +1,15 @@
+@font-face{font-family:SilkscreenNormal;src:url(http://www.nyan.cat/css/slkscr.ttf),url(http://www.nyan.cat/css/slkscr.eot);font-style:normal;}
+a img {border: none; }
+body{text-transform:uppercase;color:white;font-family:SilkscreenNormal, Monaco, "Courier New", Courier, monospace;overflow-x:hidden;font-size:14px;}
+body a:visited{color:white;}
+body a{color:white;}
+h1{text-align:center;}
+h3{text-align:center;}
+.langchooser{margin:0;font-family:Arial;background:rgba(0,0,0,0.35);position:absolute;top:0;right:0;font-size:12px;text-align:right;padding:10px;}
+.langchooser a{color:#ffffff;}
+.bottom-pane a:hover,.skinchooser a:hover,.langchooser a:hover,#volume:hover{color:pink;}
+.skinchooser li,.langchooser li{list-style:none;}
+@media screen and -webkit-min-device-pixel-ratio0 {
+
+
+
