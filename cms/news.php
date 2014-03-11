@@ -13,18 +13,6 @@ include_once("./templates/cms_header.php");
                     <div class="row">
                         <div id="akisociant"></div>
                         <?php
-                        if($_POST['action'] == "comment"){
-                            $new_id = FilterText($_POST['newid']);
-                            $comment = FilterText($_POST['comment']);
-							echo "<script type='text/javascript'>alert('Opção desativada no momento.');</script>";
-                            /*if((!$comment)){
-                                echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
-                            }else{
-                                mysql_query("INSERT INTO cms_news_comments(new_id, user_id, comment) VALUES('". $new_id ."', '". $my_id ."', '". $comment ."')") or die(mysql_query());
-                                echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
-                            }*/
-                        }
-                        
                         while ($news = mysql_fetch_array($news_sql)) {
                         $authorsql = mysql_query("SELECT * FROM users WHERE id='" . $news['author'] . "'") or die(mysql_error());
                         $author = mysql_fetch_array($authorsql);
@@ -45,46 +33,8 @@ include_once("./templates/cms_header.php");
                                     <p><?php echo $news['longstory']; ?></p>
 									<br />
                                     <p>Postada por <b><a href="<?php echo $cms_url; ?>/home.php?user=<?php echo $author['username']; ?>"><?php echo $author['username']; ?></a></b></p>
-                                    <vercommentnew<?php echo $news['id']; ?>>Comentários (<?php echo mysql_num_rows($comments); ?>)</vercommentnew<?php echo $news['id']; ?>><br />
-                                        <hiddennew<?php echo $news['id']; ?> style="display:none;">
-                                            <?php
-                                            if (mysql_num_rows($comments) > 0) {
-                                                while ($comment = mysql_fetch_array($comments)) {
-                                                    $user_comment = mysql_fetch_array(mysql_query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'")) or die(mysql_error());
-                                                    ?>
-                                                    <div style='margin:10px;'>
-                                                        <table>
-                                                            <tr>
-                                                                <td rowspan="3"><div style="background:url(http://www.habbo.co.uk/habbo-imaging/avatarimage?figure=<?php echo $user_comment['look']; ?>&size=n&direction=3&head_direction=3&action=wlk&gesture=n&size=n) -10px -18px; width:40px; height:40px; margin-right:10px;"></div></td>
-                                                                <td><b><?php echo $user_comment['username']; ?></b></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td><?php echo $comment['comment']; ?></td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
-                                                    <?php
-                                                }
-                                            } else {
-                                                echo "Não há comentários.";
-                                            }
-                                            ?>
-                                        </hiddennew<?php echo $news['id']; ?>>
-                                        <script>
-                                        $("vercommentnew<?php echo $news['id']; ?>").click(function() {
-                                            $("hiddennew<?php echo $news['id']; ?>").slideToggle("slow");
-                                        });
-                                        </script>
                                     <div id="allconets1371" style="display: none; max-height:150px;"><div></div></div>
                                 </div>
-                                <footer class="panel-footer pos-rlt">
-                                    <span class="arrow top"></span>
-                                    <form class="pull-out" action="" method="post" autocomplete="off">
-                                        <input type="text" name="comment" class="form-control no-border input-lg text-sm" placeholder="Escrever comentário.." />
-                                        <input type="hidden" name="action" value="comment" />
-                                        <input type="hidden" name="newid" value="<?php echo $news['id']; ?>" />
-                                    </form>
-                                </footer>
                             </section>
                         </div>
                         <?php

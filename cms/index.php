@@ -6,7 +6,7 @@ if(isset($_SESSION['username'])){
     exit;
 }
 
-if($_POST['action'] == "login_submit"){
+if(isset($_POST['submit'])){
     $username = FilterText($_POST['username']);
     $password = HoloHashMD5($_POST['password']);
     if((!$username) || (!$password)){
@@ -161,9 +161,8 @@ if($_POST['action'] == "login_submit"){
                                 </div>
                             </div>-->
 
-                            <a href="#" onclick="Alert('Opção desativada no momento. Em breve estará disponível!')" class="pull-right m-t-xs"><small>Esqueceu a Senha?</small></a>
-                            <button type="submit" id="submit" class="btn btn-info">Entrar</button>
-                            <input type="hidden" id="hidden" name="action" value="login_submit" />
+                            <a href="./forgotpass.php" onclick="Alert('Opção desativada no momento. Em breve estará disponível!')" class="pull-right m-t-xs"><small>Esqueceu a Senha?</small></a>
+                            <button type="submit" name="submit" id="submit" class="btn btn-info">Entrar</button>
                             <div class="line line-dashed"></div>
                             <p class="text-muted text-center"><small>Ainda não possui uma conta?</small></p>
                             <a href="register" class="btn btn-primary btn-block">Cadastre-se no <?php echo $sitename; ?> agora mesmo!</a>

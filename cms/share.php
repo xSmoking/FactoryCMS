@@ -85,39 +85,43 @@ include_once("./templates/cms_header_share.php");
                             }
                             echo '</div>';
                             
-                            if($_GET['ac'] == "delete" && isset($_GET['id'])){
-                                $feed_id = FilterText($_GET['id']);
-                                $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
-                                $verify_row = mysql_fetch_array($verify_sql);
-                                if($verify_row['user_id'] != $my_id){
-                                    echo "<script type='text/javascript'>alert('Você não tem permissão para deletar este status.');</script>";
-                                }else{
-                                    mysql_query("DELETE FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
-                                    mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='". $feed_id ."'") or die(mysql_error());
-                                    echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
-                                    echo '<meta http-equiv="refresh" content="0; url=home.php">';
-                                    exit;
+                            if(isset($_GET['ac'])){
+                                if($_GET['ac'] == "delete" && isset($_GET['id'])){
+                                    $feed_id = FilterText($_GET['id']);
+                                    $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
+                                    $verify_row = mysql_fetch_array($verify_sql);
+                                    if($verify_row['user_id'] != $my_id){
+                                        echo "<script type='text/javascript'>alert('Você não tem permissão para deletar este status.');</script>";
+                                    }else{
+                                        mysql_query("DELETE FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
+                                        mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='". $feed_id ."'") or die(mysql_error());
+                                        echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
+                                        echo '<meta http-equiv="refresh" content="0; url=home.php">';
+                                        exit;
+                                    }
                                 }
                             }
                             
-                            if($_POST['action'] == "compartilhar"){
-                                $texto = FilterText($_POST['compartilhar']);
-                                if((!$texto)){
-                                    echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar seus status.');</script>";
-                                }else{
-                                    mysql_query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('". $my_id ."', '". $texto ."', '". date("d/m") ."', '". date("H:i") ."')") or die(mysql_error());
-                                    echo "<script type='text/javascript'>alert('Status compartilhado com sucesso!');</script>";
-                                }
-                            }elseif($_POST['action'] == "comment"){
-                                $feed_id = FilterText($_POST['feedid']);
-                                $comment = FilterText($_POST['comment']);
-                                if((!$comment)){
-                                    echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
-                                }else{
-                                    mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('". $feed_id ."', '". $my_id ."', '". $comment ."')") or die(mysql_query());
-                                    echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
-                                    echo '<meta http-equiv="refresh" content="0; url=home.php">';
-                                    exit;
+                            if(isset($_POST['action'])){
+                                if($_POST['action'] == "compartilhar"){
+                                    $texto = FilterText($_POST['compartilhar']);
+                                    if((!$texto)){
+                                        echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar seus status.');</script>";
+                                    }else{
+                                        mysql_query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('". $my_id ."', '". $texto ."', '". date("d/m") ."', '". date("H:i") ."')") or die(mysql_error());
+                                        echo "<script type='text/javascript'>alert('Status compartilhado com sucesso!');</script>";
+                                    }
+                                }elseif($_POST['action'] == "comment"){
+                                    $feed_id = FilterText($_POST['feedid']);
+                                    $comment = FilterText($_POST['comment']);
+                                    if((!$comment)){
+                                        echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
+                                    }else{
+                                        mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('". $feed_id ."', '". $my_id ."', '". $comment ."')") or die(mysql_query());
+                                        echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
+                                        echo '<meta http-equiv="refresh" content="0; url=home.php">';
+                                        exit;
+                                    }
                                 }
                             }
                             

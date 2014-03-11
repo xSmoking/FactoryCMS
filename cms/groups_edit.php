@@ -16,29 +16,31 @@ if (isset($_GET['id']) AND isset($_GET['request']) AND isset($_GET['userid'])) {
     }
 }
 
-if ($_POST['action'] == "group_edit") {
-    $desc = FilterText($_POST['desc']);
-    $roomid = FilterText($_POST['roomid']);
-    $locked = FilterText($_POST['locked']);
+if(isset($_POST['action'])){
+    if ($_POST['action'] == "group_edit") {
+        $desc = FilterText($_POST['desc']);
+        $roomid = FilterText($_POST['roomid']);
+        $locked = FilterText($_POST['locked']);
 
-    $groupcheck = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='" . $my_id . "'") or die(mysql_erro());
-    $roomcheck = mysql_query("SELECT * FROM rooms WHERE id='" . $roomid . "'") or die(mysql_erro());
-    $roominfo = mysql_fetch_array($roomcheck);
+        $groupcheck = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='" . $my_id . "'") or die(mysql_erro());
+        $roomcheck = mysql_query("SELECT * FROM rooms WHERE id='" . $roomid . "'") or die(mysql_erro());
+        $roominfo = mysql_fetch_array($roomcheck);
 
-    if ((!$desc) || (!$locked) || (!$roomid)) {
-        $msg_echo = "Erro: preencha todos os campos.";
-    } else {
-        if (strlen($desc) > 250) {
-            echo "<script type='text/javascript'>alert('Descrição muito comprida.');</script>";
-        } elseif (mysql_num_rows($roomcheck) < 1) {
-            echo "<script type='text/javascript'>alert('Este quarto n&atilde;o existe.');</script>";
-        } elseif ($roominfo['owner'] != $myrow['username']) {
-            echo "<script type='text/javascript'>alert('Este quarto não é seu.');</script>";
-        } elseif (mysql_num_rows($groupcheck) < 1) {
-            echo "<script type='text/javascript'>alert('Você não tem permissão para editar este grupo.');</script>";
+        if ((!$desc) || (!$locked) || (!$roomid)) {
+            $msg_echo = "Erro: preencha todos os campos.";
         } else {
-            mysql_query("UPDATE groups SET `desc`='" . $desc . "', `roomid`='" . $roomid . "', `locked`='" . $locked . "' WHERE id='" . $group_id . "'") or die(mysql_error());
-            sendMusCommand($server_ip, 'updategroup', $groupid);
+            if (strlen($desc) > 250) {
+                echo "<script type='text/javascript'>alert('Descrição muito comprida.');</script>";
+            } elseif (mysql_num_rows($roomcheck) < 1) {
+                echo "<script type='text/javascript'>alert('Este quarto n&atilde;o existe.');</script>";
+            } elseif ($roominfo['owner'] != $myrow['username']) {
+                echo "<script type='text/javascript'>alert('Este quarto não é seu.');</script>";
+            } elseif (mysql_num_rows($groupcheck) < 1) {
+                echo "<script type='text/javascript'>alert('Você não tem permissão para editar este grupo.');</script>";
+            } else {
+                mysql_query("UPDATE groups SET `desc`='" . $desc . "', `roomid`='" . $roomid . "', `locked`='" . $locked . "' WHERE id='" . $group_id . "'") or die(mysql_error());
+                sendMusCommand($server_ip, 'updategroup', $groupid);
+            }
         }
     }
 }
@@ -56,14 +58,17 @@ $group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AN
                 <?php
                 if (mysql_num_rows($group_check) > 0) {
                     $mygroup = mysql_fetch_assoc($group_check);
-                    if ($_GET['request'] == "acceptall") {
-                        $requests_select = mysql_query("SELECT * FROM group_requests WHERE groupid='" . $group_id . "'") or die(mysql_error());
-                        while ($rinfo = mysql_fetch_assoc($requests_select)) {
-                            mysql_query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $group_id . "', '" . $rinfo['userid'] . "', '1')") or die(mysql_error());
-                            mysql_query("DELETE FROM group_requests WHERE groupid='" . $group_id . "' AND userid='" . $rinfo['userid'] . "'") or die(mysql_error());
+                    
+                    if(isset($_GET['request'])){
+                        if ($_GET['request'] == "acceptall") {
+                            $requests_select = mysql_query("SELECT * FROM group_requests WHERE groupid='" . $group_id . "'") or die(mysql_error());
+                            while ($rinfo = mysql_fetch_assoc($requests_select)) {
+                                mysql_query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $group_id . "', '" . $rinfo['userid'] . "', '1')") or die(mysql_error());
+                                mysql_query("DELETE FROM group_requests WHERE groupid='" . $group_id . "' AND userid='" . $rinfo['userid'] . "'") or die(mysql_error());
+                            }
+                        } elseif ($_GET['request'] == "recuseall") {
+                            mysql_query("DELETE FROM group_requests WHERE groupid='" . $group_id . "'") or die(mysql_error());
                         }
-                    } elseif ($_GET['request'] == "recuseall") {
-                        mysql_query("DELETE FROM group_requests WHERE groupid='" . $group_id . "'") or die(mysql_error());
                     }
                     ?>
                     <div class="col-lg-8">
@@ -127,11 +132,6 @@ $group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AN
                                 <section class="panel">                   
                                     <div class="panel-body">
                                         <div class="clearfix m-b">
-                                            <!--
-                                            <div id="group-reload-badge">
-                                                <img data-group="<?php echo $group_id; ?>" src="https://cdn4.iconfinder.com/data/icons/wirecons-free-vector-icons/32/refresh-16.png" id="group-reload-badge-btn" alt="Recarregar" title="Recarregar Emblema" />
-                                            </div>
-                                            -->
                                             <div style="font-size:16px; font-weight:bold;">Editar Emblema</div>
                                         </div>
                                         <center>

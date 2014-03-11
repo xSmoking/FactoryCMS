@@ -12,7 +12,8 @@ include_once("./templates/cms_header.php");
                 <div class="col-lg-8">
                     <div class="row">
                         <?php
-                        if($_GET['ac'] == "success"){
+                        if(isset($_GET['ac'])){
+                            if($_GET['ac'] == "success"){
                         ?>
                         <div class="col-lg-8">
                             <div id="alert2" style="background:#007f0c; color:#fff; padding:10px; margin-bottom:10px;">
@@ -22,6 +23,7 @@ include_once("./templates/cms_header.php");
                             </div>
                         </div>
                         <?php
+                            }
                         }
                         ?>
                         <div class="col-lg-6 col-sm-6 boxkatrix">

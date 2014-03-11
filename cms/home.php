@@ -1,6 +1,10 @@
 <?php
 include_once("./templates/cms_header.php");
-$user_ref = FilterText($_GET['profile_id']);
+
+if(isset($_GET['profile_id'])){
+    $user_ref = FilterText($_GET['profile_id']);
+}
+
 if (!empty($user_ref)) {
     $myrow = mysql_fetch_assoc(mysql_query("SELECT * FROM users WHERE username='" . $user_ref . "'")) or die(mysql_error());
 }
@@ -33,14 +37,16 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                                   </form>  
                                                 ';
                                             }
-
-                                            if ($_POST['action'] == "add_friend") {
-                                                $verifica_enviado = mysql_query("SELECT * FROM messenger_requests WHERE from_id='" . $my_id . "' AND to_id='" . $myrow['id'] . "'") or die(mysql_error());
-                                                if (mysql_num_rows($verifica_enviado) > 0) {
-                                                    echo "<br /><br /><br />Você já enviou um pedido de amizade.";
-                                                } else {
-                                                    mysql_query("INSERT INTO messenger_requests(from_id, to_id) VALUES('" . $my_id . "', '" . $myrow['id'] . "')") or die(mysql_error());
-                                                    echo "<br /><br /><br />Pedido de amizade enviado com sucesso.";
+                                            
+                                            if(isset($_POST['action'])){
+                                                if ($_POST['action'] == "add_friend") {
+                                                    $verifica_enviado = mysql_query("SELECT * FROM messenger_requests WHERE from_id='" . $my_id . "' AND to_id='" . $myrow['id'] . "'") or die(mysql_error());
+                                                    if (mysql_num_rows($verifica_enviado) > 0) {
+                                                        echo "<br /><br /><br />Você já enviou um pedido de amizade.";
+                                                    } else {
+                                                        mysql_query("INSERT INTO messenger_requests(from_id, to_id) VALUES('" . $my_id . "', '" . $myrow['id'] . "')") or die(mysql_error());
+                                                        echo "<br /><br /><br />Pedido de amizade enviado com sucesso.";
+                                                    }
                                                 }
                                             }
                                         }
@@ -124,47 +130,51 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                 }
                                 echo '</div>';
 
-                                if ($_GET['ac'] == "delete" && isset($_GET['id'])) {
-                                    $feed_id = FilterText($_GET['id']);
-                                    $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                    $verify_row = mysql_fetch_array($verify_sql);
-                                    if ($verify_row['user_id'] != $my_id) {
-                                        echo "<script type='text/javascript'>alert('Você não tem permissão para deletar este status.');</script>";
-                                    } else {
-                                        mysql_query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                        mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die(mysql_error());
-                                        echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
-                                        echo '<meta http-equiv="refresh" content="0; url=home">';
-                                        exit;
+                                if(isset($_GET['ac'])){
+                                    if ($_GET['ac'] == "delete" && isset($_GET['id'])) {
+                                        $feed_id = FilterText($_GET['id']);
+                                        $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
+                                        $verify_row = mysql_fetch_array($verify_sql);
+                                        if ($verify_row['user_id'] != $my_id) {
+                                            echo "<script type='text/javascript'>alert('Você não tem permissão para deletar este status.');</script>";
+                                        } else {
+                                            mysql_query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
+                                            mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die(mysql_error());
+                                            echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
+                                            echo '<meta http-equiv="refresh" content="0; url=home">';
+                                            exit;
+                                        }
                                     }
                                 }
 
-                                if ($_POST['action'] == "compartilhar") {
-                                    $texto = FilterText($_POST['compartilhar']);
-                                    if ((!$texto)) {
-                                        echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar seus status.');</script>";
-                                    } else {
-                                        mysql_query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('" . $my_id . "', '" . $texto . "', '" . date("d/m") . "', '" . date("H:i") . "')") or die(mysql_error());
-                                        echo "<script type='text/javascript'>alert('Status compartilhado com sucesso!');</script>";
-                                    }
-                                } elseif ($_POST['action'] == "comment") {
-                                    $feed_id = FilterText($_POST['feedid']);
-                                    $comment = FilterText($_POST['comment']);
-                                    $verify_double = mysql_query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die(mysql_error());
-                                    if ((!$comment)) {
-                                        echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
-                                    } elseif (mysql_num_rows($verify_double) > 0) {
-                                        echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.\nAperte OK e espere a página te redirecionar!');</script>";
-                                    } else {
-                                        $trace_user = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                        $trace_usera = mysql_fetch_assoc($trace_user);
-                                        mysql_query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die(mysql_error());
-                                        mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die(mysql_query());
-                                        echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
-                                        $trace_user2 = mysql_query("SELECT * FROM users WHERE id='". $trace_usera['user_id'] ."'") or die(mysql_error());
-                                        $trace_usera2 = mysql_fetch_assoc($trace_user2);
-                                        echo '<meta http-equiv="refresh" content="0; url=home-'. $trace_usera2['username'] .'">';
-                                        exit;
+                                if(isset($_POST['action'])){
+                                    if ($_POST['action'] == "compartilhar") {
+                                        $texto = FilterText($_POST['compartilhar']);
+                                        if ((!$texto)) {
+                                            echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar seus status.');</script>";
+                                        } else {
+                                            mysql_query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('" . $my_id . "', '" . $texto . "', '" . date("d/m") . "', '" . date("H:i") . "')") or die(mysql_error());
+                                            echo "<script type='text/javascript'>alert('Status compartilhado com sucesso!');</script>";
+                                        }
+                                    } elseif ($_POST['action'] == "comment") {
+                                        $feed_id = FilterText($_POST['feedid']);
+                                        $comment = FilterText($_POST['comment']);
+                                        $verify_double = mysql_query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die(mysql_error());
+                                        if ((!$comment)) {
+                                            echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
+                                        } elseif (mysql_num_rows($verify_double) > 0) {
+                                            echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.\nAperte OK e espere a página te redirecionar!');</script>";
+                                        } else {
+                                            $trace_user = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
+                                            $trace_usera = mysql_fetch_assoc($trace_user);
+                                            mysql_query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die(mysql_error());
+                                            mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die(mysql_query());
+                                            echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
+                                            $trace_user2 = mysql_query("SELECT * FROM users WHERE id='". $trace_usera['user_id'] ."'") or die(mysql_error());
+                                            $trace_usera2 = mysql_fetch_assoc($trace_user2);
+                                            echo '<meta http-equiv="refresh" content="0; url=home-'. $trace_usera2['username'] .'">';
+                                            exit;
+                                        }
                                     }
                                 }
 

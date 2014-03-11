@@ -1,13 +1,13 @@
 <?php
 include_once("./templates/cms_header.php");
 
-if ($vip > 0 && $date_normal2 !== $myrow['getmoney_date']) {
+if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
     mysql_query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
     mysql_query("UPDATE user_stats SET DailyRespectPoints = '5', DailyPetRespectPoints = '5' WHERE id = '" . $my_id . "'");
-} elseif ($vip < 1 && $date_normal2 !== $myrow['getmoney_date']) {
+} elseif ($myrow['vip'] == 0 && $date_normal2 !== $myrow['getmoney_date']) {
     mysql_query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
     mysql_query("UPDATE user_stats SET DailyRespectPoints = '3', DailyPetRespectPoints = '3' WHERE id = '" . $my_id . "'") or die(mysql_error());
-} elseif ($vip > 0 && $user_rank > 4 && $date_normal2 !== $myrow['getmoney_date']) {
+} elseif ($myrow['vip'] == 1 && $user_rank > 4 && $date_normal2 !== $myrow['getmoney_date']) {
     mysql_query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
     mysql_query("UPDATE user_stats SET DailyRespectPoints = '10', DailyPetRespectPoints = '10' WHERE id = '" . $my_id . "'") or die(mysql_error());
 }
@@ -38,58 +38,63 @@ if ($vip > 0 && $date_normal2 !== $myrow['getmoney_date']) {
 
                     <div class="row">
                         <?php
-                        if ($_GET['ac'] == "delete" && isset($_GET['id'])) {
-                            $feed_id = FilterText($_GET['id']);
-                            $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                            $verify_row = mysql_fetch_array($verify_sql);
-                            if (mysql_num_rows($verify_sql) > 0) {
-                                if ($myrow['rank'] < 4) {
-                                    echo "<script type='text/javascript'>alert('Você não tem permissão para deletar esta publicação.');</script>";
+                        if(isset($_GET['ac'])){
+                            if ($_GET['ac'] == "delete" && isset($_GET['id'])) {
+                                $feed_id = FilterText($_GET['id']);
+                                $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
+                                $verify_row = mysql_fetch_array($verify_sql);
+                                if (mysql_num_rows($verify_sql) > 0) {
+                                    if ($myrow['rank'] < 4) {
+                                        echo "<script type='text/javascript'>alert('Você não tem permissão para deletar esta publicação.');</script>";
+                                    } else {
+                                        mysql_query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
+                                        mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die(mysql_error());
+                                        echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
+                                        echo '<meta http-equiv="refresh" content="0; url=me.php">';
+                                        exit;
+                                    }
                                 } else {
-                                    mysql_query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                    mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die(mysql_error());
-                                    echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
-                                    echo '<meta http-equiv="refresh" content="0; url=me.php">';
-                                    exit;
+                                    echo "<script type='text/javascript'>alert('Esta publicação não existe.');</script>";
                                 }
-                            } else {
-                                echo "<script type='text/javascript'>alert('Esta publicação não existe.');</script>";
                             }
                         }
                         
-                        if ($_POST['action'] == "comment") {
-                            $feed_id = FilterText($_POST['feedid']);
-                            $comment = FilterText($_POST['comment']);
-                            $verify_double = mysql_query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die(mysql_error());
-                            if ((!$comment)) {
-                                echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
-                            } elseif (mysql_num_rows($verify_double) > 0) {
-                                echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.\nAperte OK e espere a página te redirecionar!');</script>";
-                            } else {
-                                $trace_user = mysql_query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
-                                $trace_usera = mysql_fetch_assoc($trace_user);
-                                mysql_query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die(mysql_error());
-                                mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die(mysql_query());
-                                echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
-                                echo '<meta http-equiv="refresh" content="0; url=me.php">';
-                                exit;
-                            }
-                        } elseif ($_POST['action'] == "updatebirth") {
-                            $day = FilterText($_POST['day']);
-                            $month = FilterText($_POST['month']);
-                            $year = FilterText($_POST['year']);
-                            if ((!$day) || (!$month) || (!$year)) {
-                                echo "<script type='text/javascript'>alert('Data de aniversário inválida');</script>";
-                            } elseif (strlen($day) > 2 OR strlen($month) > 2 OR strlen($year) > 4) {
-                                echo "<script type='text/javascript'>alert('Data de aniversário inválida');</script>";
-                            } else {
-                                $birthday = $day . "/" . $month . "/" . $year;
-                                mysql_query("UPDATE users SET birthday='" . $birthday . "' WHERE id='" . $my_id . "'") or die(mysql_error());
-                                echo "<script type='text/javascript'>alert('Data de aniversário confirmada, obrigado!');</script>";
-                                echo '<meta http-equiv="refresh" content="0; url=me.php">';
-                                exit;
+                        if(isset($_POST['action'])){
+                            if ($_POST['action'] == "comment") {
+                                $feed_id = FilterText($_POST['feedid']);
+                                $comment = FilterText($_POST['comment']);
+                                $verify_double = mysql_query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die(mysql_error());
+                                if ((!$comment)) {
+                                    echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
+                                } elseif (mysql_num_rows($verify_double) > 0) {
+                                    echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.\nAperte OK e espere a página te redirecionar!');</script>";
+                                } else {
+                                    $trace_user = mysql_query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
+                                    $trace_usera = mysql_fetch_assoc($trace_user);
+                                    mysql_query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die(mysql_error());
+                                    mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die(mysql_query());
+                                    echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
+                                    echo '<meta http-equiv="refresh" content="0; url=me.php">';
+                                    exit;
+                                }
+                            } elseif ($_POST['action'] == "updatebirth") {
+                                $day = FilterText($_POST['day']);
+                                $month = FilterText($_POST['month']);
+                                $year = FilterText($_POST['year']);
+                                if ((!$day) || (!$month) || (!$year)) {
+                                    echo "<script type='text/javascript'>alert('Data de aniversário inválida');</script>";
+                                } elseif (strlen($day) > 2 OR strlen($month) > 2 OR strlen($year) > 4) {
+                                    echo "<script type='text/javascript'>alert('Data de aniversário inválida');</script>";
+                                } else {
+                                    $birthday = $day . "/" . $month . "/" . $year;
+                                    mysql_query("UPDATE users SET birthday='" . $birthday . "' WHERE id='" . $my_id . "'") or die(mysql_error());
+                                    echo "<script type='text/javascript'>alert('Data de aniversário confirmada, obrigado!');</script>";
+                                    echo '<meta http-equiv="refresh" content="0; url=me.php">';
+                                    exit;
+                                }
                             }
                         }
+                        
                         $selec_feed = mysql_query("SELECT * FROM cms_feed_news WHERE user_id IN (SELECT DISTINCT user_one_id FROM messenger_friendships WHERE user_two_id = '" . $my_id . "') ORDER BY id DESC LIMIT 24") or die(mysql_error());
                         while ($feed = mysql_fetch_assoc($selec_feed)) {
                             $comments = mysql_query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $feed['id'] . "'") or die(mysql_error());

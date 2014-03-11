@@ -13,7 +13,7 @@ if($register_enable == false){
 
 $randomico = rand(1000000, 9999999);
 
-if ($_POST['action'] == "reg_submit") {
+if (isset($_POST['reg_submit'])) {
     $username = FilterText($_POST['username']);
     $password = HoloHashMD5($_POST['password']);
     $mail     = FilterText($_POST['mail']);
@@ -170,8 +170,7 @@ if ($_POST['action'] == "reg_submit") {
                                 Ao criar sua conta, você estará aceitando o <a target="_blank" href="http://www.factoryhotel.com.br/contrato_de_licensa_de_uso.docx" target="_blank"><b>termos e condições de uso</b></a>.
                             </div>
                             <br />
-                            <button type="submit" class="btn btn-info">Concluir Cadastro</button>
-                            <input type="hidden" id="hidden" name="action" value="reg_submit" />
+                            <button type="submit" name="reg_submit" class="btn btn-info">Concluir Cadastro</button>
                             <div class="line line-dashed"></div>
                             <p class="text-muted text-center"><small>Já possui uma conta?</small></p>
                             <a href="./" class="btn btn-white btn-block">Clique aqui e faça o login</a>

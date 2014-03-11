@@ -1,6 +1,6 @@
 <?php
 include_once("./templates/cms_header.php");
-if ($_POST['action'] == "acc_config") {
+if (isset($_POST['acc_config'])) {
     $mail = FilterText($_POST['mail']);
     $motto = FilterText($_POST['motto']);
     $pass1 = $_POST['password'];
@@ -77,8 +77,7 @@ $myrow = mysql_fetch_assoc($usersql);
     </div>
     <div class="control-group">
         <div class="controls" style="margin-top:20px;">
-            <input type="hidden" name="action" value="acc_config" />
-            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <button type="submit" name="acc_config" class="btn btn-primary">Salvar Alterações</button>
             <a href="javascript:history.back(1)" style="float:right;" class="btn btn-danger">Cancelar</a>
         </div>
     </div>

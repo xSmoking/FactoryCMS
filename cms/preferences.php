@@ -1,6 +1,6 @@
 <?php
 include_once("./templates/cms_header.php");
-if ($_POST['action'] == "save_settings") {
+if (isset($_POST['save_settings'])) {
     //$visibility = FilterText($_POST['visibility']);
     $block_newfriends = FilterText($_POST['block_newfriends']);
     $hide_online = FilterText($_POST['hide_online']);
@@ -116,8 +116,7 @@ $myrow = mysql_fetch_assoc($usersql);
     </div>
     <div class="control-group">
         <div class="controls" style="margin-top:20px;">
-            <input type="hidden" name="action" value="save_settings" />
-            <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+            <button type="submit" name="save_settings" class="btn btn-primary">Salvar Configurações</button>
             <a href="javascript:history.back(1)" style="margin-left:100px;" class="btn btn-danger">Cancelar</a>
         </div>
     </div>

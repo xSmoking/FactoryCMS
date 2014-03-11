@@ -15,7 +15,7 @@ $cost_rubys = 500;
 $cost_pixels = 0;
 
 // Processa a compra do grupo
-if ($_POST['action'] == "group_add") {
+if (isset($_POST['group_add'])) {
     $name = FilterText($_POST['name']);
     $desc = FilterText($_POST['desc']);
     $roomid = FilterText($_POST['roomid']);
@@ -197,8 +197,7 @@ if ($_POST['action'] == "group_add") {
                                             <label style="font-weight:normal;"><input type="radio" name="locked" value="open" checked="true" /> <b>Aberto</b> - Todos podem entrar</label><br />
                                             <label style="font-weight:normal;"><input type="radio" name="locked" value="locked" /> <b>Trancado</b> - Usuário devem pedir permissão</label><br />
                                             <label style="font-weight:normal;"><input type="radio" name="locked" value="closed" /> <b>Fechado</b> - Ninguém pode entrar</label><br />
-                                            <input type="hidden" name="action" value="group_add" />
-                                            <input type="submit" value="Criar Grupo" />
+                                            <input type="submit" name="group_add" value="Criar Grupo" />
                                         </form>
                                     </div>
                                 </div>
@@ -225,8 +224,7 @@ if ($_POST['action'] == "group_add") {
                                         <label style="font-weight:normal;"><input type="radio" name="locked" value="open" checked="true" /> <b>Aberto</b> - Todos podem entrar</label><br />
                                         <label style="font-weight:normal;"><input type="radio" name="locked" value="locked" /> <b>Trancado</b> - Usuário devem pedir permissão</label><br />
                                         <label style="font-weight:normal;"><input type="radio" name="locked" value="closed" /> <b>Fechado</b> - Ninguém pode entrar</label><br />
-                                        <input type="hidden" name="action" value="group_add" />
-                                        <input type="submit" value="Criar Grupo" />
+                                        <input type="submit" name="group_add" value="Criar Grupo" />
                                     </form>
                                     <?php
                                 }
