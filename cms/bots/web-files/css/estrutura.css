@@ -1,0 +1,36 @@
+/* 
+    Document   : estrutura
+    Created on : 27/03/2013, 19:00:40
+    Author     : xSmoking [João Vitor]
+*/
+
+body{
+    background:url(http://www.habbox.com/images/calvin/archive/images/backgrounds/tiles/bg.png);
+    font-size:13px;
+    font-family:Segoe ui;
+    margin-top:20px;
+}
+#wrap-site{
+    width:900px;
+    position:absolute;
+    left:50%;
+    margin-left:-450px;
+}
+
+/* TOPO DO SITE */
+#wrap-topo{
+    width:900px;
+    height:45px;
+}
+#wrap-topo #topo{
+    width:900px;
+    height:45px;
+    padding-top:10px;
+    text-align:center;
+}
+
+/* CONTEÚDO */
+#wrap-content #meio{
+    width:900px;
+    padding:3px 10px 0px 10px;
+}

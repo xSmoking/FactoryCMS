@@ -1,0 +1,51 @@
+/* 
+    Document   : estrutura
+    Created on : 27/03/2013, 19:00:40
+    Author     : xSmoking [João Vitor]
+*/
+
+body{
+    background:url(../images/bg.jpg) fixed;
+    font-size:13px;
+    font-family:Segoe ui;
+}
+#wrap-site{
+    width:900px;
+    position:absolute;
+    left:50%;
+    margin-left:-450px;
+}
+
+/* TOPO DO SITE */
+#wrap-topo{
+    width:900px;
+    height:45px;
+}
+#wrap-topo #topo{
+    width:900px;
+    height:35px;
+    padding-top:10px;
+    text-align:center;
+}
+
+/* CONTEÚDO */
+#wrap-content #meio{
+    width:880px;
+    padding:3px 10px 0px 10px;
+}
+#wrap-content ul{
+	float:left;
+	width:100%;
+}
+#wrap-content ul li{
+	list-style:none;
+	padding:3px 5px;
+	background:#FFF;
+	border:solid 1px #FFF;
+}
+#wrap-content ul li:hover{
+	background:#00d300;
+	border:solid 1px #00b500;
+	cursor:pointer;
+}
+#wrap-content ul li a{text-decoration:none; color:#000;}

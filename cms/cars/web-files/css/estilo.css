@@ -1,0 +1,66 @@
+.a{
+color:blue;
+text-decoration:underline;
+}
+.a:hover{
+text-decoration:none;
+}
+
+/* TOPO DO SITE */
+#wrap-topo{
+    width:900px;
+    height:45px;
+}
+#wrap-topo #topo{
+    background:url(../images/topo.png);
+    color:#FFF;
+    font-size:18px;
+    font-weight:bold;
+}
+
+/* CONTEÚDO */
+#wrap-content #meio{
+    background:url(../images/topo_meio.png);
+    color:#000;
+    font-size:13px;
+}
+
+/* RODAPÉ */
+#wrap-bottom{
+    background:url(../images/bottom.png);
+    width:900px;
+    height:9px;
+}
+
+/* TABELAS E FORMS */
+table{
+    font-size:13px;
+    font-family:Verdana;
+}
+form input[type=text], form select{
+    padding:2px 4px;
+    border:solid 1px #000;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+form input[type=submit], #cancel{
+    padding:5px 15px;
+    color:#FFF;
+    font-weight:bold;
+    background:#00b500;
+    border:solid 1px #000;
+    box-shadow:1px 1px #000;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+form input[type=submit]:hover, #cancel:hover{
+    cursor:pointer;
+    background:#008700;
+}
+#cancel{
+	padding:6px 15px;
+	font-size:13px;
+	text-decoration:none;
+}

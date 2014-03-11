@@ -1,0 +1,41 @@
+.a{
+color:blue;
+text-decoration:underline;
+}
+.a:hover{
+text-decoration:none;
+}
+
+/* TOPO DO SITE */
+#wrap-topo{
+    width:900px;
+    height:45px;
+}
+#wrap-topo #topo{
+    background:url(../images/topo.png);
+    color:#FFF;
+    font-size:18px;
+    font-weight:bold;
+}
+
+/* CONTEÚDO */
+#wrap-content #meio{
+    background:url(../images/topo_meio.png);
+    color:#000;
+    font-size:13px;
+}
+
+/* RODAPÉ */
+#wrap-bottom{
+    background:url(../images/bottom.png);
+    width:900px;
+    height:9px;
+}
+
+/* TABELAS E FORMS */
+table{
+    font-size:13px;
+    font-family:Verdana;
+}
+#cancel{background:#e50000;}
+#cancel:hover{cursor:pointer; background:#bf0000;}
