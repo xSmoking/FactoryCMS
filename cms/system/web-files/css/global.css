@@ -1,0 +1,145 @@
+/* 
+    Document   : global
+    Created on : 17/11/2013, 14:55:13
+    Author     : Usuario
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+*{margin:0px; padding:0px;}
+body{
+    background:url(../images/bg2.png);
+    font-size:13px;
+    font-family:Segoe UI;
+    color:#666;
+}
+#bg_fundo{
+    background:url(../images/bg_fundo.png);
+    width:466px;
+    height:617px;
+    position:absolute;
+    margin-left:10%;
+    margin-top:10%;
+    z-index:-1;
+}
+
+/* ###### MENU ###### */
+#wrap-menu{
+    float:left;
+    min-height:100%;
+    width:210px;
+    border-right:solid 1px #fff;
+    border-bottom:solid 1px #fff;
+    background:#e5e5e5;
+}
+#wrap-menu #topo{
+    background:#0085f2;
+    color:#fff;
+    text-align:center;
+    padding:10px;
+    border-bottom:solid 1px #fff;
+    font-size:14px;
+}
+#wrap-menu #content ul{list-style:none;}
+#wrap-menu #content ul li{
+    padding:7px 10px;
+    background:#ededed;
+    border-bottom:solid 1px #fff;
+}
+#wrap-menu a{
+    color:#666;
+    text-decoration:none;
+}
+#wrap-menu a:hover{
+    color:#000;
+    text-decoration:underline;
+}
+
+/* ###### MAIN ###### */
+#wrap-main{
+    position:absolute;
+    margin-left:237px;
+    width:60%;
+}
+#wrap-main #big-box{
+    width:100%;
+    position:relative;
+    margin-top:20px;
+    background:#e5e5e5;
+    border:solid 1px #fff;
+    padding:10px;
+    margin-bottom:20px;
+}
+#wrap-main a{font-size:13px; color:#666; text-decoration:none;}
+#wrap-main a:hover{text-decoration:underline;}
+
+#wrap-main #box-changerank,
+#wrap-main #box-changepass,
+#wrap-main #box-rankchanged{
+    background:#E5E5E5;
+    border:solid 1px #FFF;
+    box-shadow:1px 1px 10px #000;
+    padding:20px;
+    position:absolute;
+    left:50%;
+}
+
+#wrap-main #box-changerank{
+    width:200px;
+    margin-left:-100px;
+}
+
+#wrap-main #box-rankchanged,
+#wrap-main #box-changepass{
+    width:400px;
+    margin-left:-200px;
+}
+
+/* ###### RIGHT ###### */
+#wrap-right{
+    float:right;
+    width:20%;
+}
+#wrap-right #box{
+    width:100%;
+    background:#e5e5e5;
+    border-left:solid 1px #fff;
+    border-bottom:solid 1px #fff;
+}
+#wrap-right #box #topo{
+    background:#0085f2;
+    color:#fff;
+    text-align:center;
+    padding:10px;
+    border-bottom:solid 1px #fff;
+    font-size:14px;
+}
+#wrap-right #box #content{
+    padding:10px;
+    border-bottom:solid 1px #fff;
+}
+
+/* ###### CLASSES E BOTÕES ###### */
+.title{font-size:18px;}
+.subtitle{font-size:16px;}
+
+#wrap-main #big-box #button{
+    padding:10px;
+    color:#fff;
+    display:block;
+    text-align:center;
+    margin-bottom:10px;
+}
+.red{background:#f23e3e;}
+.blue{background:#3e8cf2; max-width:200px;}
+.green{background:#16cc16; max-width:200px;}
+
+.menuAbas{background:#ccc; color: #798492; }
+.menuAbas-sel{background:#ccc; color: #ffffff;}
+
+#change-pass{
+    background:url("../images/pass.png") no-repeat;
+    width:16px;
+    height:16px;
+    display:block;
+}
