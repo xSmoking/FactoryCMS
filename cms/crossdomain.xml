@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!DOCTYPE cross-domain-policy SYSTEM "http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd"><cross-domain-policy>
+<site-control permitted-cross-domain-policies="master-only"/>
+<allow-access-from domain="localhost"/>
+<allow-access-from domain="server.factoryhotel.com.br"/>
+<allow-access-from domain="factoryhotel.com.br"/>
+</cross-domain-policy>

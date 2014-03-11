@@ -1,0 +1,39 @@
+<ifModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+</ifModule>
+
+ErrorDocument 404 /404.php
+
+RewriteEngine on 
+RewriteRule ^me$ ./me.php
+RewriteRule ^register$ ./newacc.php
+RewriteRule ^store$ ./loja.php
+RewriteRule ^community$ ./news.php
+RewriteRule ^home$ ./home.php
+RewriteRule ^premium$ ./premium.php
+RewriteRule ^logout$ ./logout.php
+RewriteRule ^settings$ ./config.php
+RewriteRule ^preferences$ ./preferences.php
+RewriteRule ^buyruby$ ./coins.php
+RewriteRule ^topstats$ ./topstats.php
+RewriteRule ^share$ ./share.php
+RewriteRule ^client$ ./client.php
+RewriteRule ^loading$ ./loading.php
+RewriteRule ^clientutils$ ./clientutils.php
+
+RewriteRule ^groups$ ./groups.php
+RewriteRule ^groups-(..*)$ ./group_view.php?groupid=$1
+RewriteRule ^groupedit-(..*)$ ./groups_edit.php?id=$1
+RewriteRule ^home-(..*)$ ./home.php?profile_id=$1
+RewriteRule ^groupedit-(..*)-(..*)-(..*)$ ./groups_edit.php?id=$1&request-type=$2&userid=$3
+
+RewriteRule ^new/(..*)$ ./news/ver_new.php?id=$1
+RewriteRule ^categorie-(..*)$ ./news/categoria.php?id=$1
+
+RewriteRule ^forum/categories$ ./forum/categorias.php
+
+RewriteRule ^forum/categorie-(..*)$ ./forum/categoria.php?id=$1
+
+RewriteRule ^promo-(..*)$ ./promo_ver.php?id=$1
