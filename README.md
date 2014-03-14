@@ -5,7 +5,7 @@ Factory Hotel CMS
 
 HTML/CSS created by KekoCity and PHP by me.
 
-Only works for Phoenix database. Doesn't coded to BCStorm!
+Only works for Phoenix database and derivatives. Doesn't coded to BCStorm!
 
 *MusCommand is configured to Phoenix Emulator, just edit the client_ip in cms_settings*
 ___
