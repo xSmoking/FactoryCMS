@@ -47,6 +47,9 @@ if (isset($_POST['reg_submit'])) {
     } elseif (mysql_num_rows($verificauser) > 0){
         $msg_type = "error";
         $msg_echo = "Este nome de usuário já está sendo utilizado";
+    } elseif (strlen($username) < 5){
+        $msg_type = "error";
+        $msg_echo = "Nome de usuário muito curto";
     } else {
         $birthday = $regdia."/".$regmes."/".$regano;
         mysql_query("INSERT INTO `users`(username,birthday,password,auth_ticket,motto,mail,rank,look,gender,account_created,last_online,online,ip_last,ip_reg) VALUES ('". $username ."', '". $birthday ."', '". $password ."', '-/-', 'Bem-vindo ao ". $sitename ."', '". $mail ."', '1', 'ch-215-62.hd-180-7.lg-270-64.sh-300-62.hr-100-1354', '". $gender ."', '". $date_full ."','" . date('d/m/Y - H:i:s') . "', '1', '" . $remote_ip . "','" . $remote_ip . "')") or die(mysql_error());
