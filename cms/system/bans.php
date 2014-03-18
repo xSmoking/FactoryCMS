@@ -4,10 +4,10 @@ $pagename = "Banidos";
 
 if(isset($_GET['delete'])){
     $id = FilterText($_GET['delete']);
-    $busca = mysql_query("SELECT * FROM bans WHERE id='". $id ."'") or die(mysql_error());
-    if(mysql_num_rows($busca) > 0){
-        mysql_query("DELETE FROM bans WHERE id='". $id ."'") or die(mysql_error());
-        sendMusCommand('127.0.0.1', 'reloadbans');
+    $busca = $connect->query("SELECT * FROM bans WHERE id='". $id ."'") or die($connect->error());
+    if($busca->num_rows > 0){
+        $connect->query("DELETE FROM bans WHERE id='". $id ."'") or die($connect->error());
+        sendMusCommand($server_ip, 'reloadbans');
         echo "<script type='text/javascript'>alert('Banimento removido.');</script>";
     }else{
         echo "<script type='text/javascript'>alert('Erro: este usuário não está banido.');</script>";
@@ -38,9 +38,9 @@ if(isset($_GET['delete'])){
                     <?php
                     if(isset($_GET['search'])){
                         $search = FilterText($_GET['search']);
-                        $busca = mysql_query("SELECT * FROM bans WHERE value='". $search ."'") or die(mysql_error());
-                        if(mysql_num_rows($busca) > 0){
-                        while($ban = mysql_fetch_assoc($busca)){
+                        $busca = $connect->query("SELECT * FROM bans WHERE value='". $search ."'") or die($connect->error());
+                        if($busca->num_rows > 0){
+                        while($ban = $busca->fetch_assoc()){
                     ?>
                             <tr>
                                 <td><?php echo $ban['value']; ?></td>
@@ -56,8 +56,8 @@ if(isset($_GET['delete'])){
                             echo "<tr><td>Nenhum registro encontrado.</td></tr>";
                         }
                     }else{
-                        $bans_sql = mysql_query("SELECT * FROM bans LIMIT 30") or die(msqyl_error());
-                        while($ban = mysql_fetch_assoc($bans_sql)){
+                        $bans_sql = $connect->query("SELECT * FROM bans LIMIT 30") or die($connect->error());
+                        while($ban = $bans_sql->fetch_assoc()){
                     ?>
                         <tr>
                             <td><?php echo $ban['value']; ?></td>

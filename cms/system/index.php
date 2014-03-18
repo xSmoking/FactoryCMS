@@ -1,8 +1,7 @@
 <?php
-include_once("./template/header.php");
 $pagename = "Início";
+include_once("./template/header.php");
 ?>
-        <title><?php echo $sitename. " - ". $pagename; ?></title>
         <div id="wrap-main">
             <div id="big-box">
                 <div style="font-size:18px; margin-bottom:10px; padding-bottom:10px; border-bottom:solid 1px #a3a3a3;">Equipe do Hotel</div>
@@ -15,10 +14,10 @@ $pagename = "Início";
                         <td style="text-align:center;">Online</td>
                     </thead>
                     <?php 
-                    $staff_sql = mysql_query("SELECT * FROM users WHERE rank > 3 ORDER BY rank DESC") or die(msqyl_error());
-                    while($staff = mysql_fetch_assoc($staff_sql)){
-                    $rank_sql = mysql_query("SELECT * FROM ranks WHERE id='". $staff['rank'] ."'") or die(msqyl_error());
-                    $rank = mysql_fetch_assoc($rank_sql);
+                    $staff_sql = $connect->query("SELECT * FROM users WHERE rank > 3 ORDER BY rank DESC") or die($connect->error());
+                    while($staff = $staff_sql->fetch_assoc()){
+                    $rank_sql = $connect->query("SELECT * FROM ranks WHERE id='". $staff['rank'] ."'") or die($connect->error());
+                    $rank = $rank_sql->fetch_assoc();
                     ?>
                     <tr>
                         <td><?php echo $staff['username']; ?></td>

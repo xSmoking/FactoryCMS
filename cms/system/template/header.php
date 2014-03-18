@@ -8,6 +8,7 @@ if($myrow['rank'] < 4){
 <html>
     <head>
         <meta charset="UTF-8" />
+        <title><?php echo $sitename. " - ". $pagename; ?></title>
         <!-- Carrega o CSS -->
         <link rel="stylesheet" type="text/css" href="<?php echo $adminpath; ?>/web-files/css/global.css" />
         <link rel="stylesheet" type="text/css" href="<?php echo $adminpath; ?>/web-files/css/bootstrap.css" />
@@ -77,9 +78,9 @@ if($myrow['rank'] < 4){
                     <li><a href="<?php echo $adminpath; ?>/chatlog.php">&raquo; Chatlog</a></li>
                     <li><a href="<?php echo $adminpath; ?>/news.php">&raquo; Notícias</a></li>
                     <li><a href="<?php echo $adminpath; ?>/badges.php">&raquo; Emblemas</a></li>
-                    <li><a href="<?php echo $adminpath; ?>/ruby.php">&raquo; Loja de Rubis</a></li>
+                    <!--<li><a href="<?php echo $adminpath; ?>/ruby.php">&raquo; Loja de Rubis</a></li>-->
                     <li><a href="<?php echo $adminpath; ?>/voucher.php">&raquo; Códigos (Voucher)</a></li>
-                    <li><a href="<?php echo $adminpath; ?>/systema.php">&raquo; Sistema</a></li>
+                    <li><a href="<?php echo $adminpath; ?>/settings.php">&raquo; Configurações</a></li>
                     <li><a href="<?php echo $adminpath; ?>/muscommand.php">&raquo; MUS Command</a></li>
                     <li>
                         <form action="finduser.php" method="get">

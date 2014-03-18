@@ -1,26 +1,26 @@
 <?php
-include_once("./template/header.php");
 $pagename = "Adicionar Banimento";
-if ($_POST['action'] == "addban") {
+include_once("./template/header.php");
+
+if (isset($_POST['addban'])) {
     $value = FilterText($_POST['value']);
     $reason = FilterText($_POST['reason']);
     $expire = FilterText($_POST['expire']);
     $expire_full = time() + $expire;
     $bantype = FilterText($_POST['bantype']);
 
-    $ban_exist = mysql_query("SELECT * FROM bans WHERE value='" . $value . "'") or die(mysql_error());
+    $ban_exist = $connect->query("SELECT * FROM bans WHERE value='" . $value . "'") or die($connect->error());
     if ((!$value) || (!$reason) || (!$expire) || (!$bantype)) {
         echo "<script type='text/javascript'>alert('Erro: preencha todos os campos.');</script>";
-    } elseif (mysql_num_rows($ban_exist) > 0) {
+    } elseif ($ban_exist->num_rows > 0) {
         echo "<script type='text/javascript'>alert('Erro: este usuário já está banido.');</script>";
     } else {
-        mysql_query("INSERT INTO bans(bantype, value, reason, expire, added_by, added_date) VALUES('" . $bantype . "', '" . $value . "', '" . $reason . "', '" . $expire_full . "', '" . $myrow['username'] . "', '" . $date_full . "')") or die(mysql_error());
+        $connect->query("INSERT INTO bans(bantype, value, reason, expire, added_by, added_date) VALUES('" . $bantype . "', '" . $value . "', '" . $reason . "', '" . $expire_full . "', '" . $myrow['username'] . "', '" . $date_full . "')") or die($connect->error());
         echo "<script type='text/javascript'>alert('Banimento adicionado!');</script>";
-        sendMusCommand('127.0.0.1', 'reloadbans');
+        sendMusCommand($server_ip, 'reloadbans');
     }
 }
 ?>
-        <title><?php echo $sitename . " - " . $pagename; ?></title>
         <div id="wrap-main">
             <div id="big-box">
                 <div style="font-size:18px; margin-bottom:10px; padding-bottom:10px; border-bottom:solid 1px #a3a3a3;">Banir Usuário</div>
@@ -56,8 +56,7 @@ if ($_POST['action'] == "addban") {
                         <option value="315569260">10 anos</option>
                     </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Banir</button>
-                    <input type="hidden" name="action" value="addban" />
+                    <button type="submit" name="addban" class="btn btn-primary">Banir</button>
                     <a class="btn btn-danger" style="color:#fff; float:right;" href="javascript:history.back(1);">Cancelar</a>
                 </form>
             </div>

@@ -1,8 +1,7 @@
 <?php
-include_once("./template/header.php");
 $pagename = "Códigos (Voucher)";
+include_once("./template/header.php");
 ?>
-        <title><?php echo $sitename. " - ". $pagename; ?></title>
         <div id="wrap-main">
             <div id="big-box">
                 <div style="font-size:18px; margin-bottom:10px; padding-bottom:10px; border-bottom:solid 1px #a3a3a3;">Códigos de Prêmios (Voucher)</div>
@@ -17,8 +16,8 @@ $pagename = "Códigos (Voucher)";
                         <td style="text-align:center;">Rubis</td>
                     </thead>
                     <?php 
-                    $vouchers = mysql_query("SELECT * FROM vouchers ORDER BY code") or die(msqyl_error());
-                    while($voucher = mysql_fetch_assoc($vouchers)){
+                    $vouchers = $connect->query("SELECT * FROM vouchers ORDER BY code") or die($connect->error());
+                    while($voucher = $vouchers->fetch_assoc()){
                     ?>
                     <tr>
                         <td><?php echo $voucher['code']; ?></td>

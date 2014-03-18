@@ -2,67 +2,69 @@
 include_once("./template/header.php");
 $pagename = "MUS Command";
 
-$action = FilterText($_GET['ac']);
-
-if($action == "shutdown"){
-    if($myrow['rank'] < 7){
-        echo "<script type='text/javascript'>alert('Você não possui permissão para desligar o servidor');</script>";
-    }else{
-        sendMusCommand($server_ip, 'shutdown');
-        echo "<script type='text/javascript'>alert('O servidor será desligado!');</script>";
-    }
-}elseif($action == "userdc"){
-    $username = FilterText($_GET['value']);
-    if($myrow['rank'] < 5){
-        echo "<script type='text/javascript'>alert('Você não possui permissão para desconectar algum usuário');</script>";
-    }else{
-        $usersql = mysql_query("SELECT * FROM users WHERE username='". $username ."'") or die(mysql_error());
-        if(mysql_num_rows($usersql) > 0){
-            $userinfo = mysql_fetch_assoc($usersql);
-            if($userinfo['rank'] > 3){
-                echo "<script type='text/javascript'>alert('Este usuário não pode ser desconectado');</script>";
-            }elseif($userinfo['online'] == "0"){
-                echo "<script type='text/javascript'>alert('Impossível desconectar usuário!\nO mesmo se encontra offline.');</script>";
-            }else{
-                sendMusCommand($server_ip, 'signout', $userinfo['id']);
-                echo "<script type='text/javascript'>alert('O usuário '".$userinfo['username']."' foi desconectado');</script>";
-            }
+if(isset($_GET['ac'])){
+    $action = FilterText($_GET['ac']);
+    
+    if($action == "shutdown"){
+        if($myrow['rank'] < 7){
+            echo "<script type='text/javascript'>alert('Você não possui permissão para desligar o servidor');</script>";
         }else{
-            echo "<script type='text/javascript'>alert('Este usuário não existe');</script>";
+            sendMusCommand($server_ip, 'shutdown');
+            echo "<script type='text/javascript'>alert('O servidor será desligado!');</script>";
         }
+    }elseif($action == "userdc"){
+        $username = FilterText($_GET['value']);
+        if($myrow['rank'] < 5){
+            echo "<script type='text/javascript'>alert('Você não possui permissão para desconectar algum usuário');</script>";
+        }else{
+            $usersql = $connect->query("SELECT * FROM users WHERE username='". $username ."'") or die($connect->error());
+            if($usersql->num_rows > 0){
+                $userinfo = $usersql->fetch_assoc();
+                if($userinfo['rank'] > 3){
+                    echo "<script type='text/javascript'>alert('Este usuário não pode ser desconectado');</script>";
+                }elseif($userinfo['online'] == "0"){
+                    echo "<script type='text/javascript'>alert('Impossível desconectar usuário!\nO mesmo se encontra offline.');</script>";
+                }else{
+                    sendMusCommand($server_ip, 'signout', $userinfo['id']);
+                    echo "<script type='text/javascript'>alert('O usuário '".$userinfo['username']."' foi desconectado');</script>";
+                }
+            }else{
+                echo "<script type='text/javascript'>alert('Este usuário não existe');</script>";
+            }
+        }
+    }elseif($action == "ha"){
+        $value = $_GET['value'];
+        if($myrow['rank'] < 5){
+            echo "<script type='text/javascript'>alert('Você não possui permissão para alertar o hotel');</script>";
+        }else{
+            sendMusCommand($server_ip, 'ha', $value);
+            echo "<script type='text/javascript'>alert('Alerta enviado com sucesso!');</script>";
+        }
+    }elseif($action == "update_filter"){
+        sendMusCommand($server_ip, 'update_filter');
+        echo "<script type='text/javascript'>alert('Filtro de conversa atualizado!');</script>";
+    }elseif($action == "reloadbans"){
+        sendMusCommand($server_ip, 'reloadbans');
+        echo "<script type='text/javascript'>alert('Banimentos atualizados!');</script>";
+    }elseif($action == "update_bots"){
+        sendMusCommand($server_ip, 'update_bots');
+        echo "<script type='text/javascript'>alert('BOTs atualizados!');</script>";
+    }elseif($action == "roomalert"){
+        $room_id = FilterText($_GET['id']);
+        $value = $_GET['value'];
+        if($myrow['rank'] < 4){
+            echo "<script type='text/javascript'>alert('Você não possui permissão para alertar algum quarto');</script>";
+        }else{
+            sendMusCommand($server_ip, 'roomalert', $room_id." ".$value);
+            echo "<script type='text/javascript'>alert('Alerta enviado com sucesso!');</script>";
+        }
+    }elseif($action == "update_items"){
+        sendMusCommand($server_ip, 'update_items');
+        echo "<script type='text/javascript'>alert('Items atualizados com sucesso!');</script>";
+    }elseif($action == "update_catalogue"){
+        sendMusCommand($server_ip, 'update_catalogue');
+        echo "<script type='text/javascript'>alert('Catálogo atualizado com sucesso!');</script>";
     }
-}elseif($action == "ha"){
-    $value = $_GET['value'];
-    if($myrow['rank'] < 5){
-        echo "<script type='text/javascript'>alert('Você não possui permissão para alertar o hotel');</script>";
-    }else{
-        sendMusCommand($server_ip, 'ha', $value);
-        echo "<script type='text/javascript'>alert('Alerta enviado com sucesso!');</script>";
-    }
-}elseif($action == "update_filter"){
-    sendMusCommand($server_ip, 'update_filter');
-    echo "<script type='text/javascript'>alert('Filtro de conversa atualizado!');</script>";
-}elseif($action == "reloadbans"){
-    sendMusCommand($server_ip, 'reloadbans');
-    echo "<script type='text/javascript'>alert('Banimentos atualizados!');</script>";
-}elseif($action == "update_bots"){
-    sendMusCommand($server_ip, 'update_bots');
-    echo "<script type='text/javascript'>alert('BOTs atualizados!');</script>";
-}elseif($action == "roomalert"){
-    $room_id = FilterText($_GET['id']);
-    $value = $_GET['value'];
-    if($myrow['rank'] < 4){
-        echo "<script type='text/javascript'>alert('Você não possui permissão para alertar algum quarto');</script>";
-    }else{
-        sendMusCommand($server_ip, 'roomalert', $room_id." ".$value);
-        echo "<script type='text/javascript'>alert('Alerta enviado com sucesso!');</script>";
-    }
-}elseif($action == "update_items"){
-    sendMusCommand($server_ip, 'update_items');
-    echo "<script type='text/javascript'>alert('Items atualizados com sucesso!');</script>";
-}elseif($action == "update_catalogue"){
-    sendMusCommand($server_ip, 'update_catalogue');
-    echo "<script type='text/javascript'>alert('Catálogo atualizado com sucesso!');</script>";
 }
 ?>
         <title><?php echo $sitename. " - ". $pagename; ?></title>

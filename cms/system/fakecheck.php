@@ -7,7 +7,7 @@ $pagename = "Checar Fake";
     <div id="big-box">
         <div style="font-size:18px; margin-bottom:10px; padding-bottom:10px; border-bottom:solid 1px #a3a3a3;">Checar Contas Falsas</div>
         <?php
-        if ($_POST['action'] == "check") {
+        if (isset($_POST['check'])) {
             $type = FilterText($_POST['type']);
             $value = FilterText($_POST['value']);
 
@@ -26,9 +26,9 @@ $pagename = "Checar Fake";
                     </tr>
                 ';
                 if ($type == "ip") {
-                    $user_exist = mysql_query("SELECT * FROM users WHERE ip_last='" . $value . "' OR ip_reg='" . $value . "'") or die(mysql_error());
-                    if (mysql_num_rows($user_exist) > 0) {
-                        while ($info = mysql_fetch_assoc($user_exist)) {
+                    $user_exist = $connect->query("SELECT * FROM users WHERE ip_last='" . $value . "' OR ip_reg='" . $value . "'") or die($connect->error());
+                    if ($user_exist->num_rows > 0) {
+                        while ($info = $user_exist->fetch_assoc()) {
                             if ($info['rank'] == 7) {
                                 $ip_last = "IP não pode ser exibido";
                             } else {
@@ -54,11 +54,11 @@ $pagename = "Checar Fake";
                         echo "<script type='text/javascript'>alert('Erro: não existe nenhum usuário com este IP.');</script>";
                     }
                 } elseif ($type == "user") {
-                    $user_exist = mysql_query("SELECT * FROM users WHERE username='" . $value . "'") or die(mysql_error());
-                    if (mysql_num_rows($user_exist) > 0) {
-                        $user_info = mysql_fetch_assoc($user_exist);
-                        $ip_search = mysql_query("SELECT * FROM users WHERE ip_last='" . $user_info['ip_reg'] . "' OR ip_reg='" . $user_info['ip_reg'] . "'") or die(mysql_error());
-                        while ($info = mysql_fetch_assoc($ip_search)) {
+                    $user_exist = $connect->query("SELECT * FROM users WHERE username='" . $value . "'") or die($connect->error());
+                    if ($user_exist->num_rows > 0) {
+                        $user_info = $user_exist->fetch_assoc();
+                        $ip_search = $connect->query("SELECT * FROM users WHERE ip_last='" . $user_info['ip_reg'] . "' OR ip_reg='" . $user_info['ip_reg'] . "'") or die($connect->error());
+                        while ($info = $ip_search->fetch_assoc()) {
                             if ($info['rank'] == 7) {
                                 $ip_last = "IP não pode ser exibido";
                             } else {
@@ -98,8 +98,7 @@ $pagename = "Checar Fake";
                     Usuário / IP
                     <input class="form-control" type="text" name="value" size="30" />
                 </div>
-                <button type="submit" class="btn btn-primary">Buscar</button>
-                <input type="hidden" name="action" value="check" />
+                <button type="submit" name="check" class="btn btn-primary">Buscar</button>
                 <a class="btn btn-danger" style="color:#fff; float:right;" href="javascript:history.back(1);">Cancelar</a>
             </form>
     <?php

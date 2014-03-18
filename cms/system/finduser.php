@@ -1,13 +1,12 @@
 <?php
+$pagename = "Buscar Usuário";
 include_once("./template/header.php");
 $user = FilterText($_GET['user']);
-$pagename = "Buscar Usuário - " . $user;
 
-if($_POST['action'] != "updaterank"){
+if(!isset($_POST['updaterank'])){
     echo '<style type="text/css">#box-rankchanged{display:none;}</style>';
 }
 ?>
-        <title><?php echo $sitename . " - " . $pagename; ?></title>
         <div id="wrap-main">
             <div id="big-box">
                 <ul class="nav nav-pills" style="float:right; margin:-5px 10px 0 0;">
@@ -22,12 +21,12 @@ if($_POST['action'] != "updaterank"){
                     <center>
                         <div class="form-group">
                         <?php
-                        if($_POST['action'] == "updaterank"){
+                        if(isset($_POST['updaterank'])){
                             $rankId = FilterText($_POST['rankid']);
-                            $rankVerify = mysql_query("SELECT * FROM ranks WHERE id='". $rankId ."'") or die(mysql_error());
-                            $userQuery = mysql_query("SELECT * FROM users WHERE username='". $user ."'") or die(mysql_error());
-                            $userInfo = mysql_fetch_assoc($userQuery);
-                            if(mysql_num_rows($rankVerify) > 0){
+                            $rankVerify = $connect->query("SELECT * FROM ranks WHERE id='". $rankId ."'") or die($connect->error());
+                            $userQuery = $connect->query("SELECT * FROM users WHERE username='". $user ."'") or die($connect->error());
+                            $userInfo = $userQuery->fetch_assoc();
+                            if($rankVerify->num_rows > 0){
                                 if((!$rankId)){
                                     echo "Por favor, selecione um cargo";
                                 }elseif($myrow['rank'] < 7){
@@ -35,7 +34,7 @@ if($_POST['action'] != "updaterank"){
                                 }elseif($my_id == $userInfo['id']){
                                     echo "Você não pode alterar seu próprio cargo";
                                 }else{
-                                    mysql_query("UPDATE users SET rank='". $rankId ."' WHERE id='". $userInfo['id'] ."'") or die(mysql_error());
+                                    $connect->query("UPDATE users SET rank='". $rankId ."' WHERE id='". $userInfo['id'] ."'") or die($connect->error());
                                     echo "Cargo de ". $user ." atualizado com sucesso!";
                                 }
                             }else{
@@ -49,9 +48,9 @@ if($_POST['action'] != "updaterank"){
                 </div>
                 
                 <?php
-                $usercheck = mysql_query("SELECT * FROM users WHERE username='" . $user . "' LIMIT 1") or die(mysql_error());
-                if (mysql_num_rows($usercheck) > 0) {
-                    $userinfo = mysql_fetch_assoc($usercheck);
+                $usercheck = $connect->query("SELECT * FROM users WHERE username='" . $user . "' LIMIT 1") or die($connect->error());
+                if ($usercheck->num_rows > 0) {
+                    $userinfo = $usercheck->fetch_assoc();
                     if ($userinfo['rank'] >= $myrow['rank']) {
                         $ip_last = "IP não pode ser exibido";
                     } else {
@@ -72,43 +71,44 @@ if($_POST['action'] != "updaterank"){
                                 <select id="rank" name="rankid" class="form-control">
                                     <option value="" disabled selected>Selecione um cargo</option>
                                     <?php
-                                    $ranks = mysql_query("SELECT * FROM ranks ORDER BY id") or die(mysql_error());
-                                    while($rank = mysql_fetch_assoc($ranks)){
+                                    $ranks = $connect->query("SELECT * FROM ranks ORDER BY id") or die($connect->error());
+                                    while($rank = $ranks->fetch_assoc()){
                                         echo '<option value="'. $rank['id'] .'">'. $rank['name'] .'</option>';
                                     }
                                     ?>
                                 </select>
                             </div>
-                            <input type="hidden" name="action" value="updaterank" />
-                            <button type="submit" class="btn btn-success">Salvar</button>
+                            <button type="submit" name="updaterank" class="btn btn-success">Salvar</button>
                             <button id="close-box-changerank" class="btn btn-danger">Cancelar</button>
                         </form>
                         </center>
                     </div>
                 
                     <?php
-                    if($_GET['ac'] == "changepass"){
-                        $novaSenha = geraSenha();
-                        $user = FilterText($_GET['user']);
-                        $senhaCripto = HoloHashMD5($novaSenha);
+                    if(isset($_GET['ac'])){
+                        if($_GET['ac'] == "changepass"){
+                            $novaSenha = geraSenha();
+                            $user = FilterText($_GET['user']);
+                            $senhaCripto = HoloHashMD5($novaSenha);
 
-                        echo '
-                            <div id="box-changepass">
-                                <center>
-                                <div class="form-group">
-                        ';
-                                if($myrow['rank'] < 7){
-                                    echo 'Você não possui permissão para alterar senhas';
-                                }else{
-                                    mysql_query("UPDATE users SET password='". $senhaCripto ."' WHERE username='". $user ."'") or die(mysql_error());
-                                    echo '<b>Nova Senha</b><br />'. $novaSenha .'<br />';
-                                }
-                        echo '
+                            echo '
+                                <div id="box-changepass">
+                                    <center>
+                                    <div class="form-group">
+                            ';
+                                    if($myrow['rank'] < 7){
+                                        echo 'Você não possui permissão para alterar senhas';
+                                    }else{
+                                        $connect->query("UPDATE users SET password='". $senhaCripto ."' WHERE username='". $user ."'") or die($connect->error());
+                                        echo '<b>Nova Senha</b><br />'. $novaSenha .'<br />';
+                                    }
+                            echo '
+                                    </div>
+                                    <button id="close-box-changepass" class="btn btn-danger">Fechar</button>
+                                    </center>
                                 </div>
-                                <button id="close-box-changepass" class="btn btn-danger">Fechar</button>
-                                </center>
-                            </div>
-                        ';
+                            ';
+                        }
                     }
                     ?>
 
@@ -187,7 +187,7 @@ if($_POST['action'] != "updaterank"){
                         </tr>
                         <tr>
                             <td width="50%">Registrado em</td>
-                            <td width="50%"><?php echo date("d/m/Y H:i:s", $userinfo['account_created']); ?></td>
+                            <td width="50%"><?php echo $userinfo['account_created']; ?></td>
                         </tr>
                         <tr>
                             <td width="50%">Usuário VIP</td>
@@ -209,8 +209,8 @@ if($_POST['action'] != "updaterank"){
                     <div style="margin-top:10px; font-size:18px;">Emblemas</div>
                     <span style="font-size:11px;">(passa o mouse para ver o código)</span><br /><br />
                     <?php
-                    $badges = mysql_query("SELECT * FROM user_badges WHERE user_id='" . $userinfo['id'] . "'") or die(mysql_error());
-                    while ($badge = mysql_fetch_assoc($badges)) {
+                    $badges = $connect->query("SELECT * FROM user_badges WHERE user_id='" . $userinfo['id'] . "'") or die($connect->error());
+                    while ($badge = $badges->fetch_assoc()) {
                         ?>
                     <a data-toggle="tooltip" title="<?php echo $badge['badge_id']; ?>"><img style="margin-right:10px;" src="<?php echo $swf_patch; ?>/c_images/album1584/<?php echo $badge['badge_id']; ?>.gif" alt="<?php echo $badge['badge_id']; ?>" /> </a>
                 <?php
