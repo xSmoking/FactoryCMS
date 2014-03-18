@@ -1,5 +1,5 @@
 <?php
-$paganame = "Criar Códigos (Voucher)";
+$pagename = "Criar Códigos (Voucher)";
 include_once("./template/header.php");
 
 if (isset($_POST['voucher_add'])) {
