@@ -9,10 +9,10 @@ if (isset($_GET['id']) AND isset($_GET['request']) AND isset($_GET['userid'])) {
     $userid = FilterText($_GET['userid']);
 
     if ($type == "accept") {
-        mysql_query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $group . "', '" . $userid . "', '1')") or die(mysql_error());
-        mysql_query("DELETE FROM group_requests WHERE groupid='" . $group . "' AND userid='" . $userid . "'") or die(mysql_error());
+        $connect->query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $group . "', '" . $userid . "', '1')") or die($connect->error());
+        $connect->query("DELETE FROM group_requests WHERE groupid='" . $group . "' AND userid='" . $userid . "'") or die($connect->error());
     } elseif ($type == "recuse") {
-        mysql_query("DELETE FROM group_requests WHERE groupid='" . $group . "' AND userid='" . $userid . "'") or die(mysql_error());
+        $connect->query("DELETE FROM group_requests WHERE groupid='" . $group . "' AND userid='" . $userid . "'") or die($connect->error());
     }
 }
 
@@ -22,30 +22,30 @@ if(isset($_POST['action'])){
         $roomid = FilterText($_POST['roomid']);
         $locked = FilterText($_POST['locked']);
 
-        $groupcheck = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='" . $my_id . "'") or die(mysql_erro());
-        $roomcheck = mysql_query("SELECT * FROM rooms WHERE id='" . $roomid . "'") or die(mysql_erro());
-        $roominfo = mysql_fetch_array($roomcheck);
+        $groupcheck = $connect->query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='" . $my_id . "'") or die($connect->error());
+        $roomcheck = $connect->query("SELECT * FROM rooms WHERE id='" . $roomid . "'") or die($connect->error());
+        $roominfo = $roomcheck->fetch_assoc();
 
         if ((!$desc) || (!$locked) || (!$roomid)) {
             $msg_echo = "Erro: preencha todos os campos.";
         } else {
             if (strlen($desc) > 250) {
                 echo "<script type='text/javascript'>alert('Descrição muito comprida.');</script>";
-            } elseif (mysql_num_rows($roomcheck) < 1) {
+            } elseif ($roomcheck->num_rows < 1) {
                 echo "<script type='text/javascript'>alert('Este quarto n&atilde;o existe.');</script>";
             } elseif ($roominfo['owner'] != $myrow['username']) {
                 echo "<script type='text/javascript'>alert('Este quarto não é seu.');</script>";
-            } elseif (mysql_num_rows($groupcheck) < 1) {
+            } elseif ($groupcheck->num-rows < 1) {
                 echo "<script type='text/javascript'>alert('Você não tem permissão para editar este grupo.');</script>";
             } else {
-                mysql_query("UPDATE groups SET `desc`='" . $desc . "', `roomid`='" . $roomid . "', `locked`='" . $locked . "' WHERE id='" . $group_id . "'") or die(mysql_error());
+                $connect->query("UPDATE groups SET `desc`='" . $desc . "', `roomid`='" . $roomid . "', `locked`='" . $locked . "' WHERE id='" . $group_id . "'") or die($connect->error());
                 sendMusCommand($server_ip, 'updategroup', $groupid);
             }
         }
     }
 }
 
-$group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='". $my_id ."'") or die(mysql_error());
+$group_check = $connect->query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='". $my_id ."'") or die($connect->error());
 ?>
 <title><?php echo $sitename; ?> - Editar Grupo</title>
 <section>
@@ -56,18 +56,18 @@ $group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AN
         <section class="scrollable wrapper">
             <div class="row">
                 <?php
-                if (mysql_num_rows($group_check) > 0) {
-                    $mygroup = mysql_fetch_assoc($group_check);
+                if ($group_check->num_rows > 0) {
+                    $mygroup = $group_check->fetch_assoc();
                     
                     if(isset($_GET['request'])){
                         if ($_GET['request'] == "acceptall") {
-                            $requests_select = mysql_query("SELECT * FROM group_requests WHERE groupid='" . $group_id . "'") or die(mysql_error());
-                            while ($rinfo = mysql_fetch_assoc($requests_select)) {
-                                mysql_query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $group_id . "', '" . $rinfo['userid'] . "', '1')") or die(mysql_error());
-                                mysql_query("DELETE FROM group_requests WHERE groupid='" . $group_id . "' AND userid='" . $rinfo['userid'] . "'") or die(mysql_error());
+                            $requests_select = $connect->query("SELECT * FROM group_requests WHERE groupid='" . $group_id . "'") or die($connect->error());
+                            while ($rinfo = $requests_select->fetch_assoc()) {
+                                $connect->query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $group_id . "', '" . $rinfo['userid'] . "', '1')") or die($connect->error());
+                                $connect->query("DELETE FROM group_requests WHERE groupid='" . $group_id . "' AND userid='" . $rinfo['userid'] . "'") or die($connect->error());
                             }
                         } elseif ($_GET['request'] == "recuseall") {
-                            mysql_query("DELETE FROM group_requests WHERE groupid='" . $group_id . "'") or die(mysql_error());
+                            $connect->query("DELETE FROM group_requests WHERE groupid='" . $group_id . "'") or die($connect->error());
                         }
                     }
                     ?>
@@ -90,8 +90,8 @@ $group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AN
                                             Quarto Principal<br />
                                             <select name="roomid" class="form-control">
                                                 <?php
-                                                $roomsql = mysql_query("SELECT * FROM rooms WHERE owner = '" . $myrow['username'] . "'") or die(mysql_error());
-                                                while ($myroom = mysql_fetch_assoc($roomsql)) {
+                                                $roomsql = $connect->query("SELECT * FROM rooms WHERE owner = '" . $myrow['username'] . "'") or die($connect->error());
+                                                while ($myroom = $roomsql->fetch_assoc()) {
                                                     ?>
                                                     <option value="<?php echo $myroom['id']; ?>" <?php if ($myroom['id'] == $mygroup['roomid']) {
                                                 echo 'selected="selected"';
@@ -155,11 +155,11 @@ $group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AN
                                                 <a href="<?php echo $cms_url; ?>/groups_edit.php?id=<?php echo $group_id; ?>&request=acceptall">Aceitar Todas</a> | <a href="<?php echo $cms_url; ?>/groups_edit.php?id=<?php echo $group_id; ?>&request=recuseall">Recusar Todas</a>
                                             </div>
                                             <?php
-                                            $request_sql = mysql_query("SELECT * FROM group_requests WHERE groupid='" . $mygroup['id'] . "' LIMIT 10") or die(mysql_query());
-                                            if (mysql_num_rows($request_sql) > 0) {
-                                                while ($request = mysql_fetch_array($request_sql)) {
-                                                    $user_search = mysql_query("SELECT * FROM users WHERE id='" . $request['userid'] . "'") or die(mysql_error());
-                                                    $user_asked = mysql_fetch_assoc($user_search);
+                                            $request_sql = $connect->query("SELECT * FROM group_requests WHERE groupid='" . $mygroup['id'] . "' LIMIT 10") or die($connect->query());
+                                            if ($request_sql->num_rows > 0) {
+                                                while ($request = $request_sql->fetch_assoc()) {
+                                                    $user_search = $connect->query("SELECT * FROM users WHERE id='" . $request['userid'] . "'") or die($connect->error());
+                                                    $user_asked = $user_search->fetch_assoc();
                                                     ?>
                                                     <div id="group-request">
                                                         <a href="home.php?user=<?php echo $user_asked['username']; ?>"><b><?php echo $user_asked['username']; ?></b></a> pediu para entrar no grupo
@@ -205,16 +205,16 @@ $group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AN
                         <ul class="list-group">
                             <li class="list-group-item">
                             <?php
-                            if (mysql_num_rows($groupsql) > 0) {
-                                $mygroups = mysql_query("SELECT * FROM groups ORDER BY name") or die(mysql_error());
-                                while ($mygroup = mysql_fetch_assoc($mygroups)) {
-                                    $members3 = mysql_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $mygroup['id'] . "'") or die(mysql_error());
-                                    $requests = mysql_query("SELECT * FROM group_requests WHERE groupid='" . $mygroup['id'] . "'") or die(mysql_error());
+                            if ($groupsql->num_rows > 0) {
+                                $mygroups = $connect->query("SELECT * FROM groups ORDER BY name") or die($connect->error());
+                                while ($mygroup = $mygroups->fetch_assoc()) {
+                                    $members3 = mysqli_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $mygroup['id'] . "'");
+                                    $requests = $connect->query("SELECT * FROM group_requests WHERE groupid='" . $mygroup['id'] . "'") or die($connect->error());
                             ?>
                                         <table style="<?php if($mygroup['id']%2 == 0){ echo 'background:#F8F8F8;'; }else{ echo 'background:#F4F4F4;'; } ?> width:100%;">
                                             <tr>
                                                 <td><img style="margin:10px 10px 10px 10px;" src="<?php echo $cms_url; ?>/habbo-imaging/badge.php?badge=<?php echo $mygroup['badge']; ?>" align="left"></td>
-                                                <td width="350px"><a href="<?php echo $cms_url; ?>/groups-<?php echo $mygroup['id']; ?>"><b><?php echo $mygroup['name']; ?></b></a><br /><?php echo $members3; ?> Membros - <?php echo mysql_num_rows($requests); ?> Solicita&ccedil;&otilde;es</td>
+                                                <td width="350px"><a href="<?php echo $cms_url; ?>/groups-<?php echo $mygroup['id']; ?>"><b><?php echo $mygroup['name']; ?></b></a><br /><?php echo $members3; ?> Membros - <?php echo $requests->num_rows; ?> Solicita&ccedil;&otilde;es</td>
                                                 <td><a href="<?php echo $cms_url; ?>/groupedit-<?php echo $mygroup['id']; ?>" id="groupedit">EDITAR</a></td>
                                             </tr>
                                         </table>

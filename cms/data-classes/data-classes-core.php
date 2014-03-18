@@ -7,22 +7,29 @@ session_start();
 // #########################################################################
 
 // Takes the data from database
-$settings_cms_url = mysql_query("SELECT * FROM cms_settings WHERE variable = 'cms_url'") or die(mysql_error());
-$settings_cms_url_array = mysql_fetch_array($settings_cms_url);
-$settings_shortname = mysql_query("SELECT * FROM cms_settings WHERE variable = 'shortname'") or die(mysql_error());
-$settings_shortname_array = mysql_fetch_array($settings_shortname);
-$settings_site_name = mysql_query("SELECT * FROM cms_settings WHERE variable = 'site_name'") or die(mysql_error());
-$settings_site_name_array = mysql_fetch_array($settings_site_name);
-$settings_facebook = mysql_query("SELECT * FROM cms_settings WHERE variable = 'facebook'") or die(mysql_error());
-$settings_facebook_array = mysql_fetch_array($settings_facebook);
-$settings_twitter = mysql_query("SELECT * FROM cms_settings WHERE variable = 'twitter'") or die(mysql_error());
-$settings_twitter_array = mysql_fetch_array($settings_twitter);
-$settings_swfpatch = mysql_query("SELECT * FROM cms_settings WHERE variable = 'swf_patch'") or die(mysql_error());
-$settings_swfpacth_array = mysql_fetch_array($settings_swfpatch);
-$settings_client_ip = mysql_query("SELECT * FROM cms_settings WHERE variable = 'client_ip'") or die(mysql_error());
-$settings_client_ip_array = mysql_fetch_array($settings_client_ip);
-$settings_client_port = mysql_query("SELECT * FROM cms_settings WHERE variable = 'client_port'") or die(mysql_error());
-$settings_client_port_array = mysql_fetch_array($settings_client_port);
+$settings_cms_url = $connect->query("SELECT * FROM cms_settings WHERE variable = 'cms_url'") or die(mysql_error());
+$settings_cms_url_array = $settings_cms_url->fetch_assoc();
+$settings_shortname = $connect->query("SELECT * FROM cms_settings WHERE variable = 'shortname'") or die(mysql_error());
+$settings_shortname_array = $settings_shortname->fetch_assoc();
+$settings_site_name = $connect->query("SELECT * FROM cms_settings WHERE variable = 'site_name'") or die(mysql_error());
+$settings_site_name_array = $settings_site_name->fetch_assoc();
+$settings_facebook = $connect->query("SELECT * FROM cms_settings WHERE variable = 'facebook'") or die(mysql_error());
+$settings_facebook_array = $settings_facebook->fetch_assoc();
+$settings_twitter = $connect->query("SELECT * FROM cms_settings WHERE variable = 'twitter'") or die(mysql_error());
+$settings_twitter_array = $settings_twitter->fetch_assoc();
+$settings_swfpatch = $connect->query("SELECT * FROM cms_settings WHERE variable = 'swf_patch'") or die(mysql_error());
+$settings_swfpacth_array = $settings_swfpatch->fetch_assoc();
+$settings_client_ip = $connect->query("SELECT * FROM cms_settings WHERE variable = 'client_ip'") or die(mysql_error());
+$settings_client_ip_array = $settings_client_ip->fetch_assoc();
+$settings_client_port = $connect->query("SELECT * FROM cms_settings WHERE variable = 'client_port'") or die(mysql_error());
+$settings_client_port_array = $settings_client_port->fetch_assoc();
+$settings_mus_port = $connect->query("SELECT * FROM cms_settings WHERE variable = 'client_mus'") or die(mysql_error());
+$settings_mus_port_array = $settings_mus_port->fetch_assoc();
+$settings_maintenance = $connect->query("SELECT * FROM cms_settings WHERE variable = 'maintenance'") or die(mysql_error());
+$settings_maintenance_array = $settings_maintenance->fetch_assoc();
+$settings_cms_register = $connect->query("SELECT * FROM cms_settings WHERE variable = 'cms_register'") or die(mysql_error());
+$settings_cms_register_array = $settings_cms_register->fetch_assoc();
+
 $server_ip = $settings_client_ip_array['value'];
 
 date_default_timezone_set('America/Sao_Paulo');
@@ -44,14 +51,17 @@ $facebook = $settings_facebook_array['value']; // facebook page
 $twitter = $settings_twitter_array['value']; // twitter page
 $client_ip = $settings_client_ip_array['value']; // client ip
 $client_port = $settings_client_port_array['value']; // client port
+$mus_port = $settings_mus_port_array['value'];
+$maintenance = $settings_maintenance_array['value'];
+$register_enable = $settings_cms_register_array['value'];
 $remote_ip = $_SERVER['REMOTE_ADDR'];
 $date_normal = date("d/m/Y");
 $date_simple = date("d/m");
 $date_normal2 = date('d.m.Y', mktime($m, $d, $Y));
 $date_full = date("d/m/Y H:i:s");
 
-$system_sql = mysql_query("SELECT * FROM server_status LIMIT 1") or die(mysql_error());
-$system = mysql_fetch_array($system_sql);
+$system_sql = $connect->query("SELECT * FROM server_status LIMIT 1") or die(mysql_error());
+$system = $system_sql->fetch_assoc();
 
 // #########################################################################
 // USER INFOS
@@ -62,22 +72,21 @@ if (isset($_SESSION['username'])) {
     $rawname = $_SESSION['username'];
     $rawpass = $_SESSION['password'];
 
-    $usersql = mysql_query("SELECT * FROM users WHERE username = '" . $rawname . "' AND password = '" . $rawpass . "' OR mail = '" . $rawname . "' AND password = '" . $rawpass . "' LIMIT 1") or die(mysql_error());
-    $myrow = mysql_fetch_assoc($usersql);
-    $user_stats_sql = mysql_query("SELECT * FROM user_stats WHERE id='". $myrow['id'] ."'") or die(mysql_error());
-    $mystat = mysql_fetch_assoc($user_stats_sql);
+    $usersql = $connect->query("SELECT * FROM users WHERE username = '" . $rawname . "' AND password = '" . $rawpass . "' OR mail = '" . $rawname . "' AND password = '" . $rawpass . "' LIMIT 1") or die(mysql_error());
+    $myrow = $usersql->fetch_assoc();
+    $user_stats_sql = $connect->query("SELECT * FROM user_stats WHERE id='". $myrow['id'] ."'") or die(mysql_error());
+    $mystat = $user_stats_sql->fetch_assoc();
 
-    $password_correct = mysql_num_rows($usersql);
+    $password_correct = $usersql->num_rows;
 
     $my_id = $myrow['id'];
     $user_rank = $myrow['rank'];
-    $user_time = $myrow['time'];
     $my_look = $myrow['look'];
-    $ban = mysql_query("SELECT * FROM bans WHERE value = '" . $myrow['username'] . "' AND bantype = 'user' or value = '" . $remote_ip . "' AND bantype = 'ip' LIMIT 1");
-    $bancheck = mysql_num_rows($ban);
+    $ban = $connect->query("SELECT * FROM bans WHERE value = '" . $myrow['username'] . "' AND bantype = 'user' or value = '" . $remote_ip . "' AND bantype = 'ip' LIMIT 1");
+    $bancheck = $ban->num_rows;
 
     if ($myrow['ip_reg'] == "0") {
-        mysql_query("UPDATE users SET ip_reg = '" . $remote_ip . "' WHERE id = '" . $myrow['id'] . "'");
+        $connect->query("UPDATE users SET ip_reg = '" . $remote_ip . "' WHERE id = '" . $myrow['id'] . "'");
     } elseif ($password_correct !== 1) {
         session_destroy();
         header("location: ". $cms_url ."");
@@ -100,7 +109,7 @@ if (isset($_SESSION['username'])) {
 // #########################################################################
 
 if (isset($_SESSION['username'])) {
-    $groupsql = mysql_query("SELECT * FROM groups WHERE ownerid = '" . $my_id . "'") or die(mysql_error());
+    $groupsql = $connect->query("SELECT * FROM groups WHERE ownerid = '" . $my_id . "'") or die(mysql_error());
 }
 
 // #########################################################################
@@ -108,10 +117,11 @@ if (isset($_SESSION['username'])) {
 // #########################################################################
 
 function FilterText($str, $advanced = false) {
+    global $connect;
     if ($advanced == true) {
-        return mysql_real_escape_string($str);
+        return $connect->real_escape_string($str);
     }
-    $str = mysql_real_escape_string(htmlspecialchars($str));
+    $str = $connect->real_escape_string(htmlspecialchars($str));
     return $str;
 }
 
@@ -158,8 +168,8 @@ function geraSenha($tamanho = 10, $maiusculas = true, $numeros = true, $simbolos
 // NEWS AND FEED NEWS
 // #########################################################################
 
-$news_sql     = mysql_query("SELECT * FROM cms_news_slider ORDER BY id DESC LIMIT 5") or die(mysql_error()); 
-$new_rows     = mysql_num_rows($news_sql);
+$news_sql     = $connect->query("SELECT * FROM cms_news_slider ORDER BY id DESC LIMIT 5") or die($connect->error()); 
+$new_rows     = $news_sql->num_rows;
 
 
 // #########################################################################
@@ -204,13 +214,14 @@ function sendMusCommand($server_ip, $command, $data=NULL, $port=30001){
 // COUNT FOR GROUPS
 // #########################################################################
 
-function mysql_evaluate($query, $default_value = "undefined") {
-    $result = mysql_query($query) or die(mysql_error());
+function mysqli_evaluate($query, $default_value = "undefined") {
+    global $connect;
+    $result = $connect->query($query) or die($connect->error());
 
-    if (mysql_num_rows($result) < 1) {
+    if ($result->num_rows < 1) {
         return $default_value;
     } else {
-        return mysql_result($result, 0);
+        return $result->fetch_array()[0];
     }
 }
 ?>

@@ -34,11 +34,11 @@ if (isset($_POST['save_settings'])) {
         $radio_autoplay = "0";
     }
 
-    mysql_query("UPDATE users SET block_newfriends = '" . $block_newfriends . "', hide_online = '" . $hide_online . "', hide_inroom = '" . $hide_inroom . "', accept_trading = '" . $accept_trading . "', radio_autoplay = '" . $radio_autoplay . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
+    $connect->query("UPDATE users SET block_newfriends = '" . $block_newfriends . "', hide_online = '" . $hide_online . "', hide_inroom = '" . $hide_inroom . "', accept_trading = '" . $accept_trading . "', radio_autoplay = '" . $radio_autoplay . "' WHERE id = '" . $my_id . "'") or die($connect->error());
     $msg = "Preferências salvas com sucesso!";
 }
-$usersql = mysql_query("SELECT * FROM users WHERE username = '" . $myrow['username'] . "' LIMIT 1") or die(mysql_error());
-$myrow = mysql_fetch_assoc($usersql);
+$usersql = $connect->query("SELECT * FROM users WHERE username = '" . $myrow['username'] . "' LIMIT 1") or die($connect->error());
+$myrow = $usersql->fetch_assoc();
 ?>
 <title><?php echo $sitename; ?> - Preferências</title>
 <style>

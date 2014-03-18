@@ -4,9 +4,9 @@ include_once("../data-classes/data-classes-core.php");
 $refer = $_SERVER['HTTP_REFERER'];
 $groupid = FilterText($_GET['id']);
 
-$check_user = mysql_query("SELECT * FROM group_memberships WHERE userid = '" . $myrow['id'] . "' AND groupid = '" . $groupid . "' AND rank=3") or die(mysql_error());
-if (mysql_num_rows($check_user) > 0) {
-    $my_membership = mysql_fetch_assoc($check_user);
+$check_user = $connect->query("SELECT * FROM group_memberships WHERE userid = '" . $myrow['id'] . "' AND groupid = '" . $groupid . "' AND rank=3") or die($connect->error());
+if ($check_user->num_rows > 0) {
+    $my_membership = $check_user->fetch_assoc();
     $rank = $my_membership['rank'];
     if ($rank < 3) {
         exit;
@@ -15,10 +15,10 @@ if (mysql_num_rows($check_user) > 0) {
     exit;
 }
 
-$checksql = mysql_query("SELECT * FROM groups WHERE id = '" . $groupid . "'") or die(mysql_error());
+$checksql = $connect->query("SELECT * FROM groups WHERE id = '" . $groupid . "'") or die($connect->error());
 
-if (mysql_num_rows($checksql) > 0) {
-    $groupdata = mysql_fetch_assoc($checksql);
+if ($checksql->num_rows > 0) {
+    $groupdata = $checksql->fetch_assoc();
 } else {
     exit;
 }

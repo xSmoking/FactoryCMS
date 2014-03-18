@@ -7,9 +7,9 @@ $appkey = FilterText($_POST['__app_key']);
 
 $badge = str_replace("NaN", "", $badge);
 
-$check_user = mysql_query("SELECT * FROM group_memberships WHERE userid = '" . $myrow['id'] . "' AND groupid = '" . $groupid . "' AND rank=3") or die(mysql_error());
-if (mysql_num_rows($check_user) > 0) {
-    $my_membership = mysql_fetch_assoc($check_user);
+$check_user = $connect->query("SELECT * FROM group_memberships WHERE userid = '" . $myrow['id'] . "' AND groupid = '" . $groupid . "' AND rank=3") or die($connect->error());
+if ($check_user->num_rows > 0) {
+    $my_membership = $check_user->fetch_assoc();
     $rank = $my_membership['rank'];
     if ($rank < 3) {
         exit;
@@ -18,9 +18,9 @@ if (mysql_num_rows($check_user) > 0) {
     exit;
 }
 
-$checksql = mysql_query("SELECT * FROM groups WHERE id = '" . $groupid . "'") or die(mysql_error());
-if (mysql_num_rows($checksql) > 0) {
-    $groupdata = mysql_fetch_assoc($checksql);
+$checksql = $connect->query("SELECT * FROM groups WHERE id = '" . $groupid . "'") or die($connect->error());
+if ($checksql->num_rows > 0) {
+    $groupdata = $checksql->fetch_assoc();
 } else {
     echo '
         <html>
@@ -41,11 +41,11 @@ if ($badge != $groupdata['badge']) {
             unlink($image);
         }
     } else {
-        mysql_query("UPDATE groups SET badge = '" . FilterText($badge) . "' WHERE id = '" . $groupid . "' LIMIT 1");
+        $connect->query("UPDATE groups SET badge = '" . FilterText($badge) . "' WHERE id = '" . $groupid . "' LIMIT 1");
         exit;
     }
 }
-mysql_query("UPDATE groups SET badge = '" . FilterText($badge) . "' WHERE id = '" . $groupid . "' LIMIT 1");
+$connect->query("UPDATE groups SET badge = '" . FilterText($badge) . "' WHERE id = '" . $groupid . "' LIMIT 1");
 sendMusCommand($server_ip, 'updategroup', $groupid);
 ?> 
 <html>

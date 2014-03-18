@@ -22,6 +22,7 @@ RewriteRule ^share$ ./share.php
 RewriteRule ^client$ ./client.php
 RewriteRule ^loading$ ./loading.php
 RewriteRule ^clientutils$ ./clientutils.php
+RewriteRule ^moderacao$ ./form_moderacao.php
 
 RewriteRule ^groups$ ./groups.php
 RewriteRule ^groups-(..*)$ ./group_view.php?groupid=$1

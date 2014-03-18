@@ -1,14 +1,15 @@
 <?php
 include_once("./templates/cms_header.php");
 
-if(isset($_GET['profile_id'])){
+if (isset($_GET['profile_id'])) {
     $user_ref = FilterText($_GET['profile_id']);
 }
 
 if (!empty($user_ref)) {
-    $myrow = mysql_fetch_assoc(mysql_query("SELECT * FROM users WHERE username='" . $user_ref . "'")) or die(mysql_error());
+    $myrow2 = $connect->query("SELECT * FROM users WHERE username='" . $user_ref . "'") or die($connect->error());
+    $myrow = $myrow2->fetch_assoc();
 }
-$verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one_id='" . $my_id . "' AND user_two_id='" . $myrow['id'] . "'") or die(mysql_error());
+$verify_friend = $connect->query("SELECT * FROM messenger_friendships WHERE user_one_id='" . $my_id . "' AND user_two_id='" . $myrow['id'] . "'") or die($connect->error());
 ?>
 <title><?php echo $sitename; ?> - Perfil</title>
 <section id="content">
@@ -27,9 +28,9 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                         <?php
                                         if (empty($user_ref)) {
                                             echo '<a class="btn btn-primary" href="./config.php">Ajustes</a>';
-                                            mysql_query("DELETE FROM cms_notifications WHERE userid='". $my_id ."'") or die(mysql_error());
+                                            $connect->query("DELETE FROM cms_notifications WHERE userid='" . $my_id . "'") or die($connect->error());
                                         } else {
-                                            if (mysql_num_rows($verify_friend) != 1 AND $myrow['id'] != $my_id) {
+                                            if ($verify_friend->num_rows != 1 AND $myrow['id'] != $my_id) {
                                                 echo '
                                                   <form action="home-' . $myrow['username'] . '" method="post">
                                                     <button type="submit" class="btn btn-primary">Adicionar Amigo</button>
@@ -37,14 +38,14 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                                   </form>  
                                                 ';
                                             }
-                                            
-                                            if(isset($_POST['action'])){
+
+                                            if (isset($_POST['action'])) {
                                                 if ($_POST['action'] == "add_friend") {
-                                                    $verifica_enviado = mysql_query("SELECT * FROM messenger_requests WHERE from_id='" . $my_id . "' AND to_id='" . $myrow['id'] . "'") or die(mysql_error());
-                                                    if (mysql_num_rows($verifica_enviado) > 0) {
+                                                    $verifica_enviado = $connect->query("SELECT * FROM messenger_requests WHERE from_id='" . $my_id . "' AND to_id='" . $myrow['id'] . "'") or die($connect->error());
+                                                    if ($verifica_enviado->num_rows > 0) {
                                                         echo "<br /><br /><br />Você já enviou um pedido de amizade.";
                                                     } else {
-                                                        mysql_query("INSERT INTO messenger_requests(from_id, to_id) VALUES('" . $my_id . "', '" . $myrow['id'] . "')") or die(mysql_error());
+                                                        $connect->query("INSERT INTO messenger_requests(from_id, to_id) VALUES('" . $my_id . "', '" . $myrow['id'] . "')") or die($connect->error());
                                                         echo "<br /><br /><br />Pedido de amizade enviado com sucesso.";
                                                     }
                                                 }
@@ -66,7 +67,7 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                             ?>
                                             <br />
                                             <?php
-                                            if (mysql_num_rows($verify_friend) > 0) {
+                                            if ($verify_friend->num_rows > 0) {
                                                 echo "<img src='./web-gallery/images/icon/yes.png' style='padding:0 5px 4px 0' alt='' />";
                                                 echo "Vocês são amigos";
                                             }
@@ -80,8 +81,8 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                             <a>
                                                 <span class="m-b-xs h4 block">
                                                     <?php
-                                                    $ffsql = mysql_query("SELECT * FROM messenger_friendships WHERE user_one_id='" . $myrow['id'] . "'") or die(mysql_error());
-                                                    echo mysql_num_rows($ffsql);
+                                                    $ffsql = $connect->query("SELECT * FROM messenger_friendships WHERE user_one_id='" . $myrow['id'] . "'") or die($connect->error());
+                                                    echo $ffsql->num_rows;
                                                     ?>
                                                 </span>
                                                 <small class="text-muted">Amigos</small>
@@ -93,9 +94,9 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                     <small class="text-uc text-xs text-muted">emblemas</small>
                                     <p>
                                         <?php
-                                        $badges_active = mysql_query("SELECT * FROM user_badges WHERE user_id='" . $myrow['id'] . "' AND badge_slot != '0'") or die(mysql_error());
-                                        while ($badge = mysql_fetch_array($badges_active)) {
-                                            echo '<img src="'. $swf_patch .'/c_images/album1584/' . $badge['badge_id'] . '.gif" alt="" />';
+                                        $badges_active = $connect->query("SELECT * FROM user_badges WHERE user_id='" . $myrow['id'] . "' AND badge_slot != '0'") or die($connect->error());
+                                        while ($badge = $badges_active->fetch_assoc()) {
+                                            echo '<img src="' . $swf_patch . '/c_images/album1584/' . $badge['badge_id'] . '.gif" alt="" />';
                                         }
                                         ?>
                                     </p>
@@ -117,7 +118,7 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                         <form method="POST" action="">
                                             <textarea class="form-control no-border" rows="5" id="compartilhar" name="compartilhar" placeholder="Compartilhe algo com seus amigos"></textarea>
                                         <footer class="panel-footer bg-light lter">
-                                            <input type="submit" class="btn btn-info pull-right btn-sm" value="Publicar" />
+                                            <input type="submit" class="btn btn-info pull-right" value="Publicar" />
                                             <input type="hidden" name="action" value="compartilhar" />
                                             <ul class="nav nav-pills nav-sm">
                                                 <li> </li>
@@ -130,16 +131,16 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                 }
                                 echo '</div>';
 
-                                if(isset($_GET['ac'])){
+                                if (isset($_GET['ac'])) {
                                     if ($_GET['ac'] == "delete" && isset($_GET['id'])) {
                                         $feed_id = FilterText($_GET['id']);
-                                        $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                        $verify_row = mysql_fetch_array($verify_sql);
+                                        $verify_sql = $connect->query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die($connect->error());
+                                        $verify_row = $verify_sql->fetch_assoc();
                                         if ($verify_row['user_id'] != $my_id) {
                                             echo "<script type='text/javascript'>alert('Você não tem permissão para deletar este status.');</script>";
                                         } else {
-                                            mysql_query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                            mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die(mysql_error());
+                                            $connect->query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die($connect->error());
+                                            $connect->query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die($connect->error());
                                             echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
                                             echo '<meta http-equiv="refresh" content="0; url=home">';
                                             exit;
@@ -147,42 +148,42 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                     }
                                 }
 
-                                if(isset($_POST['action'])){
+                                if (isset($_POST['action'])) {
                                     if ($_POST['action'] == "compartilhar") {
                                         $texto = FilterText($_POST['compartilhar']);
                                         if ((!$texto)) {
                                             echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar seus status.');</script>";
                                         } else {
-                                            mysql_query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('" . $my_id . "', '" . $texto . "', '" . date("d/m") . "', '" . date("H:i") . "')") or die(mysql_error());
+                                            $connect->query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('" . $my_id . "', '" . $texto . "', '" . date("d/m") . "', '" . date("H:i") . "')") or die($connect->error());
                                             echo "<script type='text/javascript'>alert('Status compartilhado com sucesso!');</script>";
                                         }
                                     } elseif ($_POST['action'] == "comment") {
                                         $feed_id = FilterText($_POST['feedid']);
                                         $comment = FilterText($_POST['comment']);
-                                        $verify_double = mysql_query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die(mysql_error());
+                                        $verify_double = $connect->query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die($connect->error());
                                         if ((!$comment)) {
                                             echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
-                                        } elseif (mysql_num_rows($verify_double) > 0) {
+                                        } elseif ($verify_double->num_rows > 0) {
                                             echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.\nAperte OK e espere a página te redirecionar!');</script>";
                                         } else {
-                                            $trace_user = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                            $trace_usera = mysql_fetch_assoc($trace_user);
-                                            mysql_query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die(mysql_error());
-                                            mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die(mysql_query());
+                                            $trace_user = $connect->query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die($connect->error());
+                                            $trace_usera = $trace_user->fetch_assoc();
+                                            $connect->query("INSERT INTO cms_notifications(userid) VALUES('" . $trace_usera['user_id'] . "')") or die($connect->error());
+                                            $connect->query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die($connect->query());
                                             echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
-                                            $trace_user2 = mysql_query("SELECT * FROM users WHERE id='". $trace_usera['user_id'] ."'") or die(mysql_error());
-                                            $trace_usera2 = mysql_fetch_assoc($trace_user2);
-                                            echo '<meta http-equiv="refresh" content="0; url=home-'. $trace_usera2['username'] .'">';
+                                            $trace_user2 = $connect->query("SELECT * FROM users WHERE id='" . $trace_usera['user_id'] . "'") or die($connect->error());
+                                            $trace_usera2 = $trace_user2->fetch_assoc();
+                                            echo '<meta http-equiv="refresh" content="0; url=home-' . $trace_usera2['username'] . '">';
                                             exit;
                                         }
                                     }
                                 }
 
-                                $home_feed_sql = mysql_query("SELECT * FROM cms_feed_news WHERE user_id='" . $myrow['id'] . "' ORDER BY id DESC LIMIT 6") or die(mysql_error());
-                                while ($home_feed = mysql_fetch_array($home_feed_sql)) {
-                                    $authorsql = mysql_query("SELECT * FROM users WHERE id='" . $home_feed['user_id'] . "'") or die(mysql_error());
-                                    $author = mysql_fetch_array($authorsql);
-                                    $comments = mysql_query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $home_feed['id'] . "'") or die(mysql_error());
+                                $home_feed_sql = $connect->query("SELECT * FROM cms_feed_news WHERE user_id='" . $myrow['id'] . "' ORDER BY id DESC LIMIT 6") or die($connect->error());
+                                while ($home_feed = $home_feed_sql->fetch_assoc()) {
+                                    $authorsql = $connect->query("SELECT * FROM users WHERE id='" . $home_feed['user_id'] . "'") or die($connect->error());
+                                    $author = $authorsql->fetch_assoc();
+                                    $comments = $connect->query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $home_feed['id'] . "'") or die($connect->error());
                                     ?>
                                     <div class="col-lg-6 col-sm-6 boxkatrix">
                                         <section class="panel">                   
@@ -197,12 +198,13 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
                                                         <?php if ($myrow['id'] == $my_id OR $myrow['rank'] > 3) { ?><small class="block text-muted"><a href="?ac=delete&id=<?php echo $home_feed['id']; ?>" style="color:red;">Deletar</a></small><?php } ?>
                                                     </div></div>
                                                 <p><?php echo $home_feed['publication']; ?></p>
-                                                <vercommentfeed<?php echo $home_feed['id']; ?>>Comentários (<?php echo mysql_num_rows($comments); ?>)</vercommentfeed<?php echo $home_feed['id']; ?>><br />
+                                                <vercommentfeed<?php echo $home_feed['id']; ?>>Comentários (<?php echo $commnets->num_rows; ?>)</vercommentfeed<?php echo $home_feed['id']; ?>><br />
                                                 <hiddenfeed<?php echo $home_feed['id']; ?> style="display:none;">
                                                     <?php
-                                                    if (mysql_num_rows($comments) > 0) {
-                                                        while ($comment = mysql_fetch_array($comments)) {
-                                                            $user_comment = mysql_fetch_array(mysql_query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'")) or die(mysql_error());
+                                                    if ($comments->num_rows > 0) {
+                                                        while ($comment = $comments->fetch_assoc()) {
+                                                            $user_comment2 = $connect->query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'") or die($connect->error());
+                                                            $user_comment = $user_comment2->fetch_assoc();
                                                             ?>
                                                             <div style='margin:10px;'>
                                                                 <table>
@@ -273,20 +275,20 @@ $verify_friend = mysql_query("SELECT * FROM messenger_friendships WHERE user_one
 
 <script type="text/javascript" src="http://kekocity.es:8088/socket.io/socket.io.js"></script>
 <script>
-    function verma(qdi) {
-        if ($('#' + qdi).css('display') == 'none') {
-            $('#' + qdi).slideDown('slow');
-            $('#l' + qdi).html('<i class="icon-sort-up"></i> Ver menos');
-        } else {
-            $('#' + qdi).slideUp('slow');
-            $('#l' + qdi).html('<i class="icon-sort-down"></i> Ver más');
-        }
-    }
+                                                    function verma(qdi) {
+                                                        if ($('#' + qdi).css('display') == 'none') {
+                                                            $('#' + qdi).slideDown('slow');
+                                                            $('#l' + qdi).html('<i class="icon-sort-up"></i> Ver menos');
+                                                        } else {
+                                                            $('#' + qdi).slideUp('slow');
+                                                            $('#l' + qdi).html('<i class="icon-sort-down"></i> Ver más');
+                                                        }
+                                                    }
 
-    var mirocheckprofitimeou = null;
-    var uspaprofcomurl = new Array();
-    var pakie = 'xSmoking';
-    var kekyooos = 'xSmoking';
+                                                    var mirocheckprofitimeou = null;
+                                                    var uspaprofcomurl = new Array();
+                                                    var pakie = 'xSmoking';
+                                                    var kekyooos = 'xSmoking';
 </script>
 <script src="./web-gallery/js/katrixweb.js"></script></body>
 </html>

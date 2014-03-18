@@ -2,14 +2,14 @@
 include_once("./templates/cms_header.php");
 
 if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
-    mysql_query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
-    mysql_query("UPDATE user_stats SET DailyRespectPoints = '5', DailyPetRespectPoints = '5' WHERE id = '" . $my_id . "'");
+    $connect->query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die($connect->error());
+    $connect->query("UPDATE user_stats SET DailyRespectPoints = '5', DailyPetRespectPoints = '5' WHERE id = '" . $my_id . "'");
 } elseif ($myrow['vip'] == 0 && $date_normal2 !== $myrow['getmoney_date']) {
-    mysql_query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
-    mysql_query("UPDATE user_stats SET DailyRespectPoints = '3', DailyPetRespectPoints = '3' WHERE id = '" . $my_id . "'") or die(mysql_error());
+    $connect->query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die($connect->error());
+    $connect->query("UPDATE user_stats SET DailyRespectPoints = '3', DailyPetRespectPoints = '3' WHERE id = '" . $my_id . "'") or die($connect->error());
 } elseif ($myrow['vip'] == 1 && $user_rank > 4 && $date_normal2 !== $myrow['getmoney_date']) {
-    mysql_query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die(mysql_error());
-    mysql_query("UPDATE user_stats SET DailyRespectPoints = '10', DailyPetRespectPoints = '10' WHERE id = '" . $my_id . "'") or die(mysql_error());
+    $connect->query("UPDATE users SET getmoney_date = '" . $date_normal2 . "' WHERE id = '" . $my_id . "'") or die($connect->error());
+    $connect->query("UPDATE user_stats SET DailyRespectPoints = '10', DailyPetRespectPoints = '10' WHERE id = '" . $my_id . "'") or die($connect->error());
 }
 ?>
 <title><?php echo $sitename; ?> - <?php echo $myrow['username']; ?></title>
@@ -41,14 +41,14 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                         if(isset($_GET['ac'])){
                             if ($_GET['ac'] == "delete" && isset($_GET['id'])) {
                                 $feed_id = FilterText($_GET['id']);
-                                $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                $verify_row = mysql_fetch_array($verify_sql);
-                                if (mysql_num_rows($verify_sql) > 0) {
+                                $verify_sql = $connect->query("SELECT * FROM cms_feed_news WHERE id='" . $feed_id . "'") or die($connect->error());
+                                $verify_row = $verify_sql->fetch_assoc();
+                                if ($verify_sql->num_rows > 0) {
                                     if ($myrow['rank'] < 4) {
                                         echo "<script type='text/javascript'>alert('Você não tem permissão para deletar esta publicação.');</script>";
                                     } else {
-                                        mysql_query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die(mysql_error());
-                                        mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die(mysql_error());
+                                        $connect->query("DELETE FROM cms_feed_news WHERE id='" . $feed_id . "'") or die($connect->error());
+                                        $connect->query("DELETE FROM cms_feed_news_comments WHERE feed_id='" . $feed_id . "'") or die($connect->error());
                                         echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
                                         echo '<meta http-equiv="refresh" content="0; url=me.php">';
                                         exit;
@@ -63,16 +63,16 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                             if ($_POST['action'] == "comment") {
                                 $feed_id = FilterText($_POST['feedid']);
                                 $comment = FilterText($_POST['comment']);
-                                $verify_double = mysql_query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die(mysql_error());
+                                $verify_double = $connect->query("SELECT * FROM cms_feed_news_comments WHERE comment='" . $commnet . "' AND feed_id='" . $feed_id . "' AND user_id='" . $my_id . "'") or die($connect->error());
                                 if ((!$comment)) {
                                     echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
-                                } elseif (mysql_num_rows($verify_double) > 0) {
+                                } elseif ($verify_double->num_rows > 0) {
                                     echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.\nAperte OK e espere a página te redirecionar!');</script>";
                                 } else {
-                                    $trace_user = mysql_query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
-                                    $trace_usera = mysql_fetch_assoc($trace_user);
-                                    mysql_query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die(mysql_error());
-                                    mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die(mysql_query());
+                                    $trace_user = $connect->query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die($connect->error());
+                                    $trace_usera = $trace_user->fetch_assoc();
+                                    $connect->query("INSERT INTO cms_notifications(userid) VALUES('". $trace_usera['user_id'] ."')") or die($connect->error());
+                                    $connect->query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('" . $feed_id . "', '" . $my_id . "', '" . $comment . "')") or die($connect->query());
                                     echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
                                     echo '<meta http-equiv="refresh" content="0; url=me.php">';
                                     exit;
@@ -87,7 +87,7 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                                     echo "<script type='text/javascript'>alert('Data de aniversário inválida');</script>";
                                 } else {
                                     $birthday = $day . "/" . $month . "/" . $year;
-                                    mysql_query("UPDATE users SET birthday='" . $birthday . "' WHERE id='" . $my_id . "'") or die(mysql_error());
+                                    $connect->query("UPDATE users SET birthday='" . $birthday . "' WHERE id='" . $my_id . "'") or die($connect->error());
                                     echo "<script type='text/javascript'>alert('Data de aniversário confirmada, obrigado!');</script>";
                                     echo '<meta http-equiv="refresh" content="0; url=me.php">';
                                     exit;
@@ -95,11 +95,11 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                             }
                         }
                         
-                        $selec_feed = mysql_query("SELECT * FROM cms_feed_news WHERE user_id IN (SELECT DISTINCT user_one_id FROM messenger_friendships WHERE user_two_id = '" . $my_id . "') ORDER BY id DESC LIMIT 24") or die(mysql_error());
-                        while ($feed = mysql_fetch_assoc($selec_feed)) {
-                            $comments = mysql_query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $feed['id'] . "'") or die(mysql_error());
-                            $user_sql = mysql_query("SELECT * FROM users WHERE id='" . $feed['user_id'] . "'") or die(mysql_error());
-                            $user_row = mysql_fetch_array($user_sql);
+                        $selec_feed = $connect->query("SELECT * FROM cms_feed_news WHERE user_id IN (SELECT DISTINCT user_one_id FROM messenger_friendships WHERE user_two_id = '" . $my_id . "') ORDER BY id DESC LIMIT 24") or die($connect->error());
+                        while ($feed = $selec_feed->fetch_assoc()) {
+                            $comments = $connect->query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $feed['id'] . "'") or die($connect->error());
+                            $user_sql = $connect->query("SELECT * FROM users WHERE id='" . $feed['user_id'] . "'") or die($connect->error());
+                            $user_row = $user_sql->fetch_assoc();
                             ?>
                             <div class="col-lg-6 col-sm-6 boxkatrix">
                                 <section class="panel">                   
@@ -115,13 +115,14 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                                             </div>
                                         </div>
                                         <p><?php echo $feed['publication']; ?></p>
-                                        <vercommentfeed<?php echo $feed['id']; ?> style="cursor:pointer; font-weight:bold;">Comentários (<?php echo mysql_num_rows($comments); ?>)</vercommentfeed<?php echo $feed['id']; ?>><br />
+                                        <vercommentfeed<?php echo $feed['id']; ?> style="cursor:pointer; font-weight:bold;">Comentários (<?php echo $comments->num_rows; ?>)</vercommentfeed<?php echo $feed['id']; ?>><br />
                                         <hiddenfeed<?php echo $feed['id']; ?> style="display:none;">
                                             <?php
-                                            $comments = mysql_query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $feed['id'] . "'") or die(mysql_error());
-                                            if (mysql_num_rows($comments) > 0) {
-                                                while ($comment = mysql_fetch_array($comments)) {
-                                                    $user_comment = mysql_fetch_array(mysql_query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'")) or die(mysql_error());
+                                            $comments = $connect->query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $feed['id'] . "'") or die($connect->error());
+                                            if ($comments->num_rows > 0) {
+                                                while ($comment = $comments->fetch_assoc()) {
+                                                    $user_comment2 = $connect->query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'") or die($connect->error());
+                                                    $user_comment = $user_comment2->fetch_assoc();
                                                     ?>   
                                                     <div style='margin:10px;'>
                                                         <table>
@@ -224,8 +225,8 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                     </section>
 
                     <?php
-                    $minha_linha_sql = mysql_query("SELECT * FROM users WHERE id='" . $my_id . "'") or die(mysql_error());
-                    $minhalinha = mysql_fetch_assoc($minha_linha_sql);
+                    $minha_linha_sql = $connect->query("SELECT * FROM users WHERE id='" . $my_id . "'") or die($connect->error());
+                    $minhalinha = $minha_linha_sql->fetch_assoc();
                     if ($minhalinha['birthday'] == NULL) {
                         ?>
                         <section class="panel">
@@ -295,8 +296,8 @@ if ($myrow['vip'] == 1 && $date_normal2 !== $myrow['getmoney_date']) {
                         <h4 class="font-thin padder">Últimas Notícias</h4>
                         <ul class="list-group">
                             <?php
-                            $last_news = mysql_query("SELECT * FROM cms_news_slider ORDER BY id DESC LIMIT 3") or die(mysql_error());
-                            while ($newrow = mysql_fetch_array($last_news)) {
+                            $last_news = $connect->query("SELECT * FROM cms_news_slider ORDER BY id DESC LIMIT 3") or die($connect->error());
+                            while ($newrow = $last_news->fetch_assoc()) {
                                 ?>
                                 <li class="list-group-item">
                                     <p><?php echo $newrow['title']; ?></p>

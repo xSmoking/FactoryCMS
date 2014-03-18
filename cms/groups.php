@@ -22,11 +22,11 @@ if (isset($_POST['group_add'])) {
     $locked = FilterText($_POST['locked']);
     $badge = "b0601Xs16114";
 
-    $namecheck = mysql_query("SELECT * FROM groups WHERE name='". $name ."'") or die(mysql_erro());
-    $groupcheck = mysql_query("SELECT * FROM groups WHERE ownerid='" . $my_id . "'") or die(mysql_erro());
-    $roomusingcheck = mysql_query("SELECT * FROM groups WHERE roomid='" . $roomid . "'") or die(mysql_erro());
-    $roomcheck = mysql_query("SELECT * FROM rooms WHERE id='". $roomid ."'") or die(mysql_erro());
-    $roominfo = mysql_fetch_array($roomcheck);
+    $namecheck = $connect->query("SELECT * FROM groups WHERE name='". $name ."'") or die($connect->error());
+    $groupcheck = $connect->query("SELECT * FROM groups WHERE ownerid='" . $my_id . "'") or die($connect->error());
+    $roomusingcheck = $connect->query("SELECT * FROM groups WHERE roomid='" . $roomid . "'") or die($connect->error());
+    $roomcheck = $connect->query("SELECT * FROM rooms WHERE id='". $roomid ."'") or die($connect->error());
+    $roominfo = $roomcheck->fetch_assoc();
 
     if ((!$name) || (!$desc) || (!$locked) || (!$roomid)) {
         echo "<script type='text/javascript'>alert('Preencha todos os campos.');</script>";
@@ -35,15 +35,15 @@ if (isset($_POST['group_add'])) {
             echo "<script type='text/javascript'>alert('Nome muito comprido.');</script>";
         } elseif (strlen($desc) > 250) {
             echo "<script type='text/javascript'>alert('Descrição muito comprida.');</script>";
-        } elseif (mysql_num_rows($roomcheck) < 1) {
+        } elseif ($roomcheck->num_rows < 1) {
             echo "<script type='text/javascript'>alert('Este quarto não existe.');</script>";
         } elseif ($roominfo['owner'] != $myrow['username']) {
             echo "<script type='text/javascript'>alert('Este quarto não é seu.');</script>";
-        } elseif (mysql_num_rows($roomusingcheck) > 0) {
+        } elseif ($roomusingcheck->num_rows > 0) {
             echo "<script type='text/javascript'>alert('Este quarto já está sendo usado.');</script>";
-        } elseif (mysql_num_rows($groupcheck) > 0 AND $myrow['rank'] < 2) {
+        } elseif ($groupcheck->num_rows > 0 AND $myrow['rank'] < 2) {
             echo "<script type='text/javascript'>alert('Você já tem um grupo.');</script>";
-        } elseif (mysql_num_rows($namecheck) > 0) {
+        } elseif ($namecheck->num_rows > 0) {
             echo "<script type='text/javascript'>alert('Já existe um grupo com este nome.');</script>";
         } elseif ($myrow['credits'] < $cost_credits OR $myrow['vip_points'] < $cost_rubys OR $myrow['activity_points'] < $cost_pixels){
             echo "<script type='text/javascript'>alert('Você não possui moedas/rubis suficientes.');</script>";
@@ -51,11 +51,11 @@ if (isset($_POST['group_add'])) {
             $newcoins = $myrow['credits']-$cost_credits;
             $newrubis = $myrow['vip_points']-$cost_rubys;
             $newpixels = $myrow['activity_points']-$cost_pixels;
-            mysql_query("UPDATE users SET credits='". $newcoins ."', vip_points='". $newrubis ."', activity_points='". $newpixels ."' WHERE id='". $my_id ."'") or die(mysql_error());
-            mysql_query("INSERT INTO `groups`(`name`, `desc`, `badge`, `ownerid`, `created`, `roomid`, `locked`) VALUES('" . $name . "', '" . $desc . "', '" . $badge . "', '" . $my_id . "', '" . $date_full . "', '" . $roomid . "', '" . $locked . "')") or die(mysql_error());
-            $groupsql = mysql_query("SELECT * FROM groups WHERE ownerid='" . $my_id . "' AND roomid='" . $roomid . "'") or die(mysql_error());
-            $groupinfo = mysql_fetch_assoc($groupsql);
-            mysql_query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $groupinfo['id'] . "', '" . $my_id . "', '3')") or die(mysql_error());
+            $connect->query("UPDATE users SET credits='". $newcoins ."', vip_points='". $newrubis ."', activity_points='". $newpixels ."' WHERE id='". $my_id ."'") or die($connect->error());
+            $connect->query("INSERT INTO `groups`(`name`, `desc`, `badge`, `ownerid`, `created`, `roomid`, `locked`) VALUES('" . $name . "', '" . $desc . "', '" . $badge . "', '" . $my_id . "', '" . $date_full . "', '" . $roomid . "', '" . $locked . "')") or die($connect->error());
+            $groupsql = $connect->query("SELECT * FROM groups WHERE ownerid='" . $my_id . "' AND roomid='" . $roomid . "'") or die($connect->error());
+            $groupinfo = $groupsql->fetch_assoc();
+            $connect->query("INSERT INTO group_memberships(groupid, userid, rank) VALUES('" . $groupinfo['id'] . "', '" . $my_id . "', '3')") or die($connect->error());
             echo "<script type='text/javascript'>alert('Grupo criado com sucesso!');</script>";
         }
     }
@@ -80,10 +80,10 @@ if (isset($_POST['group_add'])) {
                                     <?php
                                     // Mostra grupos com mais membros
                                     
-                                    $mgroups = mysql_query("SELECT * FROM groups ORDER BY (SELECT COUNT(*) FROM group_memberships WHERE groupid = groups.id) DESC LIMIT 5") or die(mysql_error());
-                                    if (mysql_num_rows($mgroups) > 0) {
-                                        while ($row = mysql_fetch_array($mgroups)) {
-                                            $members1 = mysql_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $row['id'] . "'") or die(mysql_error());
+                                    $mgroups = $connect->query("SELECT * FROM groups ORDER BY (SELECT COUNT(*) FROM group_memberships WHERE groupid = groups.id) DESC LIMIT 5") or die($connect->error());
+                                    if ($mgroups->num_rows > 0) {
+                                        while ($row = $mgroups->fetch_assoc()) {
+                                            $members1 = mysqli_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $row['id'] . "'");
                                             ?>
                                             <table style="<?php if($row['id']%2 == 0){ echo 'background:#F8F8F8;'; }else{ echo 'background:#F4F4F4;'; } ?> width:100%;">
                                                 <tr>
@@ -110,10 +110,10 @@ if (isset($_POST['group_add'])) {
                                     <?php
                                     // Mostra útlimos grupos criados
                                     
-                                    $groups = mysql_query("SELECT * FROM groups ORDER BY id DESC") or die(mysql_error());
-                                    if (mysql_num_rows($groups) > 0) {
-                                        while ($row = mysql_fetch_array($groups)) {
-                                            $members2 = mysql_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $row['id'] . "'") or die(mysql_error());
+                                    $groups = $connect->query("SELECT * FROM groups ORDER BY id DESC") or die($connect->error());
+                                    if ($groups->num_rows > 0) {
+                                        while ($row = $groups->fetch_assoc()) {
+                                            $members2 = mysqli_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $row['id'] . "'");
                                             ?>
                                             <table style="<?php if($row['id']%2 == 0){ echo 'background:#F8F8F8;'; }else{ echo 'background:#F4F4F4;'; } ?> width:100%;">
                                                 <tr>
@@ -149,7 +149,7 @@ if (isset($_POST['group_add'])) {
                     <section class="panel">
                         <h4 class="font-thin padder">
                             <?php
-                            if (mysql_num_rows($groupsql) > 0) {
+                            if ($groupsql->num_rows > 0) {
                                 echo "Meus Grupos";
                             } else {
                                 echo "Criar um Grupo";
@@ -159,16 +159,16 @@ if (isset($_POST['group_add'])) {
                         <ul class="list-group">
                             <li class="list-group-item">
                                 <?php
-                                if (mysql_num_rows($groupsql) > 0) {
-                                    $mygroups = mysql_query("SELECT * FROM groups WHERE ownerid='". $my_id ."' ORDER BY name") or die(mysql_error());
-                                    while ($mygroup = mysql_fetch_assoc($mygroups)) {
-                                        $members3 = mysql_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $mygroup['id'] . "'") or die(mysql_error());
-                                        $requests = mysql_query("SELECT * FROM group_requests WHERE groupid='". $mygroup['id'] ."'") or die(mysql_error());
+                                if ($groupsql->num_rows > 0) {
+                                    $mygroups = $connect->query("SELECT * FROM groups WHERE ownerid='". $my_id ."' ORDER BY name") or die($connect->error());
+                                    while ($mygroup = $mygroups->fetch_assoc()) {
+                                        $members3 = mysqli_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $mygroup['id'] . "'");
+                                        $requests = $connect->query("SELECT * FROM group_requests WHERE groupid='". $mygroup['id'] ."'") or die($connect->error());
                                 ?>
                                         <table style="<?php if($mygroup['id']%2 == 0){ echo 'background:#F8F8F8;'; }else{ echo 'background:#F4F4F4;'; } ?> width:100%;">
                                             <tr>
                                                 <td><img style="margin:10px 10px 10px 10px;" src="<?php echo $cms_url; ?>/habbo-imaging/badge.php?badge=<?php echo $mygroup['badge']; ?>" align="left"></td>
-                                                <td width="350px"><a href="<?php echo $cms_url; ?>/groups-<?php echo $mygroup['id']; ?>"><b><?php echo $mygroup['name']; ?></b></a><br /><?php echo $members3; ?> Membros - <?php echo mysql_num_rows($requests); ?> Solicita&ccedil;&otilde;es</td>
+                                                <td width="350px"><a href="<?php echo $cms_url; ?>/groups-<?php echo $mygroup['id']; ?>"><b><?php echo $mygroup['name']; ?></b></a><br /><?php echo $members3; ?> Membros - <?php echo $requests->num_rows; ?> Solicita&ccedil;&otilde;es</td>
                                                 <td><a href="<?php echo $cms_url; ?>/groupedit-<?php echo $mygroup['id']; ?>" id="groupedit">EDITAR</a></td>
                                             </tr>
                                         </table>
@@ -187,8 +187,8 @@ if (isset($_POST['group_add'])) {
                                             Quarto Principal<br />
                                             <select name="roomid">
                                                 <?php
-                                                $roomsql = mysql_query("SELECT * FROM rooms WHERE owner = '" . $myrow['username'] . "'") or die(mysql_error());
-                                                while ($myroom = mysql_fetch_assoc($roomsql)) {
+                                                $roomsql = $connect->query("SELECT * FROM rooms WHERE owner = '" . $myrow['username'] . "'") or die($connect->error());
+                                                while ($myroom = $roomsql->fetch_assoc()) {
                                                     echo '<option value="' . $myroom['id'] . '">' . utf8_decode($myroom['caption']) . '</option>';
                                                 }
                                                 ?>
@@ -214,8 +214,8 @@ if (isset($_POST['group_add'])) {
                                         Quarto Principal<br />
                                         <select name="roomid">
                                             <?php
-                                            $roomsql = mysql_query("SELECT * FROM rooms WHERE owner = '" . $myrow['username'] . "'") or die(mysql_error());
-                                            while ($myroom = mysql_fetch_assoc($roomsql)) {
+                                            $roomsql = $connect->query("SELECT * FROM rooms WHERE owner = '" . $myrow['username'] . "'") or die($connect->error());
+                                            while ($myroom = $roomsql->fetch_assoc()) {
                                                 echo '<option value="' . $myroom['id'] . '">' . $myroom['caption'] . '</option>';
                                             }
                                             ?>

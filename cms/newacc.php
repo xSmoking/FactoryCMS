@@ -25,9 +25,9 @@ if (isset($_POST['reg_submit'])) {
     $s_rand   = FilterText($_POST['s_rand']);
     $filter   = preg_match("/^([a-zA-Z0-9]+)$/", $username);
     
-    $verificafake = mysql_query("SELECT * FROM users WHERE ip_last='". $remote_ip ."' OR ip_reg='". $remote_ip ."'") or die(mysql_error());
-    $verificauser = mysql_query("SELECT * FROM users WHERE username='". $username ."'") or die(mysql_error());
-    $verificamail = mysql_query("SELECT * FROM users WHERE mail='". $mail ."'") or die(mysql_error());
+    $verificafake = $connect->query("SELECT * FROM users WHERE ip_last='". $remote_ip ."' OR ip_reg='". $remote_ip ."'") or die($connect->error());
+    $verificauser = $connect->query("SELECT * FROM users WHERE username='". $username ."'") or die($connect->error());
+    $verificamail = $connect->query("SELECT * FROM users WHERE mail='". $mail ."'") or die($connect->error());
 
     if ($n_rand != $s_rand) {
         $msg_type = "error";
@@ -38,13 +38,13 @@ if (isset($_POST['reg_submit'])) {
     } elseif((!$username) || (!$password) || (!$mail) || (!$regdia) || (!$regmes) || (!$regano) || (!$n_rand)){
         $msg_type = "error";
         $msg_echo = "Preencha todos os campos para realizar o cadastro";
-    } elseif (mysql_num_rows($verificafake) > 1) {
+    } elseif ($verificafake->num_rows > 1) {
         $msg_type = "error";
         $msg_echo = "Você já possui duas contas neste IP, por isso não poderá criar outra";
-    } elseif (mysql_num_rows($verificamail) > 0){
+    } elseif ($verificamail->num_rows > 0){
         $msg_type = "error";
         $msg_echo = "Este e-mail já esta sendo utilizado";
-    } elseif (mysql_num_rows($verificauser) > 0){
+    } elseif ($verificauser->num_rows > 0){
         $msg_type = "error";
         $msg_echo = "Este nome de usuário já está sendo utilizado";
     } elseif (strlen($username) < 5){
@@ -52,12 +52,12 @@ if (isset($_POST['reg_submit'])) {
         $msg_echo = "Nome de usuário muito curto";
     } else {
         $birthday = $regdia."/".$regmes."/".$regano;
-        mysql_query("INSERT INTO `users`(username,birthday,password,auth_ticket,motto,mail,rank,look,gender,account_created,last_online,online,ip_last,ip_reg) VALUES ('". $username ."', '". $birthday ."', '". $password ."', '-/-', 'Bem-vindo ao ". $sitename ."', '". $mail ."', '1', 'ch-215-62.hd-180-7.lg-270-64.sh-300-62.hr-100-1354', '". $gender ."', '". $date_full ."','" . date('d/m/Y - H:i:s') . "', '1', '" . $remote_ip . "','" . $remote_ip . "')") or die(mysql_error());
-        $userdata2 = mysql_query("SELECT * FROM users WHERE username = '". $username ."'");
-        $userdata = mysql_fetch_assoc($userdata2);
+        $connect->query("INSERT INTO `users`(username,birthday,password,auth_ticket,motto,mail,rank,look,gender,account_created,last_online,online,ip_last,ip_reg) VALUES ('". $username ."', '". $birthday ."', '". $password ."', '-/-', 'Bem-vindo ao ". $sitename ."', '". $mail ."', '1', 'ch-215-62.hd-180-7.lg-270-64.sh-300-62.hr-100-1354', '". $gender ."', '". $date_full ."','" . date('d/m/Y - H:i:s') . "', '1', '" . $remote_ip . "','" . $remote_ip . "')") or die($connect->error());
+        $userdata2 = $connect->query("SELECT * FROM users WHERE username = '". $username ."'");
+        $userdata = $userdata2->fetch_assoc();
 
-        mysql_query("INSERT INTO `user_info` (user_id,reg_timestamp) VALUES ('". $userdata['id'] ."','". time() ."')");
-        mysql_query("INSERT INTO `user_stats` (id) VALUES ('". $userdata['id'] ."')");
+        $connect->query("INSERT INTO `user_info` (user_id,reg_timestamp) VALUES ('". $userdata['id'] ."','". time() ."')");
+        $connect->query("INSERT INTO `user_stats` (id) VALUES ('". $userdata['id'] ."')");
 
         $_SESSION['username'] = $username;
         $_SESSION['password'] = $password;

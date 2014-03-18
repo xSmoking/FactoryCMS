@@ -3,9 +3,9 @@ require_once('./data-classes/data-classes-core.php');
 require_once('./data-classes/data-classes-session.php');
 require_once('./templates/client_subheader.php');
 //require_once('./adfly.php');
-mysql_query("UPDATE users SET auth_ticket = '" . GenerateTicket() . "', ip_last = '" . $remote_ip . "' WHERE id = '" . $my_id . "' and username = '" . $myrow['username'] . "'") or die(mysql_error());
-$ticketsql = mysql_query("SELECT * FROM users WHERE id = '" . $my_id . "' AND username = '" . $myrow['username'] . "'") or die(mysql_error());
-$ticketrow = mysql_fetch_assoc($ticketsql);
+$connect->query("UPDATE users SET auth_ticket = '" . GenerateTicket() . "', ip_last = '" . $remote_ip . "' WHERE id = '" . $my_id . "' and username = '" . $myrow['username'] . "'") or die($connect->error());
+$ticketsql = $connect->query("SELECT * FROM users WHERE id = '" . $my_id . "' AND username = '" . $myrow['username'] . "'") or die($connect->error());
+$ticketrow = $ticketsql->fetch_assoc();
 ?>
 
 <script type="text/javascript">

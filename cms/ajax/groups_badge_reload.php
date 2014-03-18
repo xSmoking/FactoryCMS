@@ -2,10 +2,10 @@
 require_once("../data-classes/data-classes-core.php");
 
 $group_id = FilterText($_GET['id']);
-$group_check = mysql_query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='". $my_id ."'") or die(mysql_error());
+$group_check = $connect->query("SELECT * FROM groups WHERE id='" . $group_id . "' AND ownerid='". $my_id ."'") or die($connect->error());
 
-if (mysql_num_rows($group_check) > 0) {
-    $mygroup = mysql_fetch_assoc($group_check);
+if ($group_check->num_rows > 0) {
+    $mygroup = $group_check->fetch_assoc();
     echo '<img id="badge" src="'. $cms_url .'/habbo-imaging/badge.php?badge='. $mygroup['badge'] .'">';
 }
 ?>

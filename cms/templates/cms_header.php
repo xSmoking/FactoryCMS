@@ -93,11 +93,11 @@ Caso for utilizar, por favor, mantenha os créditos!
                         <!-- user -->
                         <div class="bg-success nav-user hidden-xs pos-rlt">
                             <?php
-                            $notifications = mysql_query("SELECT * FROM cms_notifications WHERE userid='". $my_id ."'") or die(mysql_error());
+                            $notifications = $connect->query("SELECT * FROM cms_notifications WHERE userid='". $my_id ."'") or die(mysqli_error());
                             ?>
                             <div class="nav-avatar pos-rlt">
-                                <a href="home" title="<?php echo mysql_num_rows($notifications); ?> Notificações" style="display:block; background:red; position:absolute; margin-left:97px; padding:3px 9px; -webkit-border-radius:15px; -moz-border-radius:15px; border-radius:15px;">
-                                    <?php echo mysql_num_rows($notifications); ?>
+                                <a href="home" title="<?php echo $notifications->num_rows; ?> Notificações" style="display:block; background:red; position:absolute; margin-left:97px; padding:3px 9px; -webkit-border-radius:15px; -moz-border-radius:15px; border-radius:15px;">
+                                    <?php echo $notifications->num_rows; ?>
                                 </a>
                                 <a href="#" class="thumb-sm animated rollIn" data-toggle="dropdown">
                                     <div style="background:url(http://www.habbo.co.uk/habbo-imaging/avatarimage?figure=<?php echo $my_look; ?>&size=b&direction=2&head_direction=2&action=wlk&gesture=n&size=n) -8px -10px; width:50px; height:50px;"></div>

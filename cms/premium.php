@@ -60,28 +60,28 @@ include_once("./templates/cms_header.php");
                                     ?>
                                     <a href="buyruby" style="display:block; float:right; margin-top:20px;" class="btn btn-success">Comprar Rubis</a>
                                     <div style="float:left; margin-top:70px;">
-                                    <?php
-                                    echo '<div style="margin-top:10px;">';
-                                    
-                                    if(isset($_GET['buy'])){
-                                        if ($_GET['buy'] == "premium") {
-                                            if ($myrow['vip_points'] < 1000) {
-                                                echo "Você não possui rubis suficientes.";
-                                            } elseif ($myrow['vip'] == 1) {
-                                                echo "Você já é Premium.";
-                                            } elseif ($myrow['online'] == 1) {
-                                                echo "Fique offline para adquirir.";
-                                            } else {
-                                                $newAchi = $mystat['AchievementScore'] + 200;
-                                                $newPts = $myrow['vip_points'] - 1000;
-                                                mysql_query("UPDATE users SET rank='2', vip='1', vip_points='" . $newPts . "' WHERE id='" . $my_id . "'") or die(mysql_error());
-                                                mysql_query("UPDATE user_stats SET AchievementScore='" . $newAchi . "' WHERE id='" . $my_id . "'") or die(mysql_error());
-                                                echo "Compra realizada, agora você é Premium.";
+                                        <?php
+                                        echo '<div style="margin-top:10px;">';
+
+                                        if (isset($_GET['buy'])) {
+                                            if ($_GET['buy'] == "premium") {
+                                                if ($myrow['vip_points'] < 1000) {
+                                                    echo "Você não possui rubis suficientes.";
+                                                } elseif ($myrow['vip'] == 1) {
+                                                    echo "Você já é Premium.";
+                                                } elseif ($myrow['online'] == 1) {
+                                                    echo "Fique offline para adquirir.";
+                                                } else {
+                                                    $newAchi = $mystat['AchievementScore'] + 200;
+                                                    $newPts = $myrow['vip_points'] - 1000;
+                                                    $connect->query("UPDATE users SET rank='2', vip='1', vip_points='" . $newPts . "' WHERE id='" . $my_id . "'") or die($connect->error());
+                                                    $connect->query("UPDATE user_stats SET AchievementScore='" . $newAchi . "' WHERE id='" . $my_id . "'") or die($connect->error());
+                                                    echo "Compra realizada, agora você é Premium.";
+                                                }
                                             }
                                         }
-                                    }
-                                    echo '</div>';
-                                    ?>
+                                        echo '</div>';
+                                        ?>
                                     </div>
                                 </div>
                             </section>

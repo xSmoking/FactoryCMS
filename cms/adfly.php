@@ -15,20 +15,20 @@ function generarPassword($longitud)
 if($_SERVER['HTTP_REFERER'] != "http://adf.ly/IF2So"){
   $gen = generarPassword(devil);
   $_SESSION['pin'] = $gen;
-  mysql_query("UPDATE users SET pin = '".$gen."' WHERE id = '$my_id'");
+  $connect->query("UPDATE users SET pin = '".$gen."' WHERE id = '$my_id'");
   Header("Location: http://adf.ly/IF2So");
   die();
 }
 
 if($_SESSION['pin'] == $myrow['pin']){
  $_SESSION['pin'] = "";
- mysql_query("UPDATE users SET pin = '' id = '$my_id'");
+ $connect->query("UPDATE users SET pin = '' id = '$my_id'");
 }
 else
 {
   $gen = generarPassword(devil);
   $_SESSION['pin'] = $gen;
-  mysql_query("UPDATE users SET pin = '".$gen."' WHERE id = '$my_id'");
+  $connect->query("UPDATE users SET pin = '".$gen."' WHERE id = '$my_id'");
   Header("Location: http://adf.ly/IF2So");
   die();
 }

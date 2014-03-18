@@ -13,10 +13,10 @@ include_once("./templates/cms_header.php");
                     <div class="row">
                         <div id="akisociant"></div>
                         <?php
-                        while ($news = mysql_fetch_array($news_sql)) {
-                        $authorsql = mysql_query("SELECT * FROM users WHERE id='" . $news['author'] . "'") or die(mysql_error());
-                        $author = mysql_fetch_array($authorsql);
-                        $comments = mysql_query("SELECT * FROM cms_news_comments WHERE new_id='" . $news['id'] . "'") or die(mysql_error());
+                        while ($news = $news_sql->fetch_assoc()) {
+                        $authorsql = $connect->query("SELECT * FROM users WHERE id='" . $news['author'] . "'") or die(mysql_error());
+                        $author = $authorsql->fetch_assoc();
+                        $comments = $connect->query("SELECT * FROM cms_news_comments WHERE new_id='" . $news['id'] . "'") or die(mysql_error());
                         ?>
                         <div id="view<?php echo $news['id']; ?>" style="margin-left:15px;">
                             <section class="panel">                   
@@ -57,10 +57,10 @@ include_once("./templates/cms_header.php");
                         <h4 class="font-thin padder">Aniversariantes do Dia</h4>
                         <ul class="list-group">
                             <?php
-                            $consulta = mysql_query("SELECT * FROM users WHERE birthday LIKE '%". $date_simple ."%'") or die(mysql_error());
+                            $consulta = $connect->query("SELECT * FROM users WHERE birthday LIKE '%". $date_simple ."%'") or die(mysql_error());
                             
-                            if(mysql_num_rows($consulta) > 0){
-                            while($niver = mysql_fetch_assoc($consulta)){
+                            if($consulta->num_rows > 0){
+                            while($niver = $consulta->fetch_assoc()){
                             ?>
                             <li class="list-group-item">
                                 <p><?php echo $niver['username']; ?></p>

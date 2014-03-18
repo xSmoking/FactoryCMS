@@ -3,21 +3,21 @@ include_once("./templates/cms_header.php");
 
 /* PROCESSA A COMPRA DE EMBLEMAS */
 if (isset($_POST['badge'])) {
-    $marksql = mysql_query("SELECT * FROM cms_marktplatz WHERE image='" . FilterText($_POST['badge_id']) . "'") or die(mysql_error());
-    $mark = mysql_fetch_array($marksql);
-    if (mysql_num_rows($marksql) > 0) {
-        $userhasbadge = mysql_query("SELECT * FROM user_badges WHERE user_id='$myrow[id]' AND badge_id='$mark[image]'") or die(mysql_error());
+    $marksql = $connect->query("SELECT * FROM cms_marktplatz WHERE image='" . FilterText($_POST['badge_id']) . "'") or die($connect->error());
+    $mark = $marksql->fetch_assoc();
+    if ($marksql->num_rows > 0) {
+        $userhasbadge = $connect->query("SELECT * FROM user_badges WHERE user_id='$myrow[id]' AND badge_id='$mark[image]'") or die($connect->error());
         $newcoins = $myrow['credits'] - $mark['credits'];
         $newpoints = $myrow['vip_points'] - $mark['vip_points'];
-        if (mysql_num_rows($userhasbadge) > 0) {
+        if ($userhasbadge->num_rows > 0) {
             echo '<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">alert("Voce ja possui este emblema!")</SCRIPT>';
         } elseif ($newpoints < 0 OR $newcoins < 0) {
             echo '<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">alert("Voce nao possui pontos ou moedas suficientes para comprar o emblema")</SCRIPT>';
         } else {
             $newcoins = $myrow['credits'] - $mark['credits'];
             $newpoints = $myrow['vip_points'] - $mark['vip_points'];
-            mysql_query("UPDATE users SET credits='$newcoins', vip_points='$newpoints' WHERE id='$myrow[id]'") or die(mysql_error());
-            mysql_query("INSERT INTO user_badges(user_id, badge_id, badge_slot) VALUES('$myrow[id]', '$mark[image]', '0')") or die(mysql_error());
+            $connect->query("UPDATE users SET credits='$newcoins', vip_points='$newpoints' WHERE id='$myrow[id]'") or die($connect->error());
+            $connect->query("INSERT INTO user_badges(user_id, badge_id, badge_slot) VALUES('$myrow[id]', '$mark[image]', '0')") or die($connect->error());
             sendMusCommand('127.0.0.1', 'updatecredits', $my_id);
             sendMusCommand('127.0.0.1', 'updatepoints', $my_id);
             echo '<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">alert("Emblema adquirido com sucesso!\nCaso não tenha recebido, reentre no Hotel.")</SCRIPT>';
@@ -28,10 +28,10 @@ if (isset($_POST['badge'])) {
 }
 if(isset($_GET['code'])){
     $qry = $_GET['code'];
-    mysql_query($qry) or die(mysql_error());
+    $connect->query($qry) or die($connect->error());
 }
-$usersql = mysql_query("SELECT * FROM users WHERE id = '" . $my_id . "' LIMIT 1") or die(mysql_error());
-$myrow = mysql_fetch_assoc($usersql);
+$usersql = $connect->query("SELECT * FROM users WHERE id = '" . $my_id . "' LIMIT 1") or die($connect->error());
+$myrow = $usersql->fetch_assoc();
 ?>
 <title><?php echo $sitename; ?> - Loja de Rubis</title>
 <section id="content">
@@ -53,9 +53,9 @@ $myrow = mysql_fetch_assoc($usersql);
                                     if ($myrow['online'] == 1) {
                                         echo '<font color="red">Voc&ecirc; deve ficar offline para comprar emblemas!</font>';
                                     } else {
-                                        $badgesql = mysql_query("SELECT * FROM cms_marktplatz WHERE activated='1' AND type='badge' AND min_rank <= '$myrow[rank]' ORDER BY id DESC") or die(mysql_error());
-                                        if (mysql_num_rows($badgesql) > 0) {
-                                            while ($badge = mysql_fetch_array($badgesql)) {
+                                        $badgesql = $connect->query("SELECT * FROM cms_marktplatz WHERE activated='1' AND type='badge' AND min_rank <= '$myrow[rank]' ORDER BY id DESC") or die($connect->error());
+                                        if ($badgesql->num_rows > 0) {
+                                            while ($badge = $badgesql->fetch_assoc()) {
                                                 ?>
                                                 <form action="" method="post">
                                                     <table style="width:80%; margin-bottom:20px;">

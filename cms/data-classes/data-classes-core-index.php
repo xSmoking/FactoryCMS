@@ -7,20 +7,28 @@ session_start();
 // #########################################################################
 
 // Takes the data from database
-$settings_cms_url = mysql_query("SELECT * FROM cms_settings WHERE variable = 'cms_url'") or die(mysql_error());
-$settings_cms_url_array = mysql_fetch_array($settings_cms_url);
-$settings_shortname = mysql_query("SELECT * FROM cms_settings WHERE variable = 'shortname'") or die(mysql_error());
-$settings_shortname_array = mysql_fetch_array($settings_shortname);
-$settings_site_name = mysql_query("SELECT * FROM cms_settings WHERE variable = 'site_name'") or die(mysql_error());
-$settings_site_name_array = mysql_fetch_array($settings_site_name);
-$settings_facebook = mysql_query("SELECT * FROM cms_settings WHERE variable = 'facebook'") or die(mysql_error());
-$settings_facebook_array = mysql_fetch_array($settings_facebook);
-$settings_twitter = mysql_query("SELECT * FROM cms_settings WHERE variable = 'twitter'") or die(mysql_error());
-$settings_twitter_array = mysql_fetch_array($settings_twitter);
-$settings_swfpatch = mysql_query("SELECT * FROM cms_settings WHERE variable = 'swf_patch'") or die(mysql_error());
-$settings_swfpacth_array = mysql_fetch_array($settings_swfpatch);
-$settings_cms_register = mysql_query("SELECT * FROM cms_settings WHERE variable = 'cms_register'") or die(mysql_error());
-$settings_cms_register_array = mysql_fetch_array($settings_cms_register);
+$settings_cms_url = $connect->query("SELECT * FROM cms_settings WHERE variable = 'cms_url'") or die($connect->error());
+$settings_cms_url_array = $settings_cms_url->fetch_assoc();
+$settings_shortname = $connect->query("SELECT * FROM cms_settings WHERE variable = 'shortname'") or die($connect->error());
+$settings_shortname_array = $settings_shortname->fetch_assoc();
+$settings_site_name = $connect->query("SELECT * FROM cms_settings WHERE variable = 'site_name'") or die($connect->error());
+$settings_site_name_array = $settings_site_name->fetch_assoc();
+$settings_facebook = $connect->query("SELECT * FROM cms_settings WHERE variable = 'facebook'") or die($connect->error());
+$settings_facebook_array = $settings_facebook->fetch_assoc();
+$settings_twitter = $connect->query("SELECT * FROM cms_settings WHERE variable = 'twitter'") or die($connect->error());
+$settings_twitter_array = $settings_twitter->fetch_assoc();
+$settings_swfpatch = $connect->query("SELECT * FROM cms_settings WHERE variable = 'swf_patch'") or die($connect->error());
+$settings_swfpacth_array = $settings_swfpatch->fetch_assoc();
+$settings_client_ip = $connect->query("SELECT * FROM cms_settings WHERE variable = 'client_ip'") or die($connect->error());
+$settings_client_ip_array = $settings_client_ip->fetch_assoc();
+$settings_client_port = $connect->query("SELECT * FROM cms_settings WHERE variable = 'client_port'") or die($connect->error());
+$settings_client_port_array = $settings_client_port->fetch_assoc();
+$settings_mus_port = $connect->query("SELECT * FROM cms_settings WHERE variable = 'client_mus'") or die($connect->error());
+$settings_mus_port_array = $settings_mus_port->fetch_assoc();
+$settings_maintenance = $connect->query("SELECT * FROM cms_settings WHERE variable = 'maintenance'") or die($connect->error());
+$settings_maintenance_array = $settings_maintenance->fetch_assoc();
+$settings_cms_register = $connect->query("SELECT * FROM cms_settings WHERE variable = 'cms_register'") or die($connect->error());
+$settings_cms_register_array = $settings_cms_register->fetch_assoc();
 
 date_default_timezone_set('America/Sao_Paulo');
 
@@ -39,25 +47,31 @@ $swf_patch = $settings_swfpacth_array['value']; // raiz da SWF
 $adminpath = $settings_cms_url_array['value']."/system"; // site do hotel /system (acesso ou housekeeping)
 $facebook = $settings_facebook_array['value']; // página do facebook
 $twitter = $settings_twitter_array['value']; // página do twitter
-$register_enable = $settings_cms_register_array['value']; // criar contar - true ou false
+$client_ip = $settings_client_ip_array['value']; // client ip
+$client_port = $settings_client_port_array['value']; // client port
+$mus_port = $settings_mus_port_array['value'];
+$maintenance = $settings_maintenance_array['value'];
+$register_enable = $settings_cms_register_array['value'];
 $remote_ip = $_SERVER['REMOTE_ADDR'];
 $date_normal = date("d/m/Y");
 $date_simple = date("d/m");
 $date_normal2 = date('d.m.Y', mktime($m, $d, $Y));
 $date_full = date("d/m/Y H:i:s");
 
-$system_sql = mysql_query("SELECT * FROM server_status LIMIT 1") or die(mysql_error());
-$system = mysql_fetch_array($system_sql);
+$system_sql = $connect->query("SELECT * FROM server_status LIMIT 1") or die($connect->error());
+$system = $system_sql->fetch_assoc();
 
 // #########################################################################
 // Funções necessárias
 // #########################################################################
 
 function FilterText($str, $advanced = false) {
+    global $connect;
     if ($advanced == true) {
-        return mysql_real_escape_string($str);
+        $str = $connect->real_escape_string($str);
+        return $str;
     }
-    $str = mysql_real_escape_string(htmlspecialchars($str));
+    $str = $connect->real_escape_string(htmlspecialchars($str));
     return $str;
 }
 
@@ -120,11 +134,6 @@ function GenerateTicket() {
 // #########################################################################
 // FUNCTION MUS COMMAND
 // #########################################################################
-
-$settings_client_ip = mysql_query("SELECT * FROM cms_settings WHERE variable = 'client_ip'") or die(mysql_error());
-$settings_client_ip_array = mysql_fetch_array($settings_client_ip);
-
-$server_ip = $settings_client_ip_array['value'];
 
 function sendMusCommand($server_ip, $command, $data=NULL, $port=30001){
     $data = $command . chr(1) . $data;

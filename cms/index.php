@@ -13,15 +13,15 @@ if(isset($_POST['submit'])){
         $msg_type = "error";
         $msg_echo = "Preencha os campos para realizar o login";
     }else{
-        $user_verify = mysql_query("SELECT * FROM users WHERE username = '". $username ."' AND password = '". $password ."' OR mail = '". $username ."' AND password = '". $password ."'") or die(mysql_error());
-        if(mysql_num_rows($user_verify) > 0){
-            $ban_verify = mysql_query("SELECT * FROM bans WHERE value = '". $username ."' AND bantype = 'user' OR value = '". $remote_ip ."' AND bantype = 'ip'") or die(mysql_error());
-            if(mysql_num_rows($ban_verify) > 0){
-                $ban_array = mysql_fetch_assoc($ban_verify);
+        $user_verify = $connect->query("SELECT * FROM users WHERE username = '". $username ."' AND password = '". $password ."' OR mail = '". $username ."' AND password = '". $password ."'") or die($connect->error());
+        if($user_verify->num_rows > 0){
+            $ban_verify = $connect->query("SELECT * FROM bans WHERE value = '". $username ."' AND bantype = 'user' OR value = '". $remote_ip ."' AND bantype = 'ip'") or die($connect->error());
+            if($ban_verify->num_rows > 0){
+                $ban_array = $ban_verify->fetch_assoc();
                 $timestamp = time();
                 if($ban_array['expire'] <= $timestamp){
-                    mysql_query("DELETE FROM bans WHERE value = '". $username ."'") or die(mysql_error());
-                    mysql_query("UPDATE users SET ip_last = '" . $remote_ip . "', WHERE username = '" . $username . "'") or die(mysql_error());
+                    $connect->query("DELETE FROM bans WHERE value = '". $username ."'") or die($connect->error());
+                    $connect->query("UPDATE users SET ip_last = '" . $remote_ip . "', WHERE username = '" . $username . "'") or die($connect->error());
                     $_SESSION['username'] = $username;
                     $_SESSION['password'] = $password;
                     header("location: $cms_url/me");
@@ -30,7 +30,7 @@ if(isset($_POST['submit'])){
                     $msg_echo = "Você está banido até <b>". date('d/m/Y H:i', $ban_array['expire']) ."</b><br /><b>Motivo:</b> ". $ban_array['reason'];
                 }
             }else{
-                mysql_query("UPDATE users SET ip_last = '" . $remote_ip . "' WHERE username = '" . $username . "'") or die(mysql_error());
+                $connect->query("UPDATE users SET ip_last = '" . $remote_ip . "' WHERE username = '" . $username . "'") or die($connect->error());
                 $_SESSION['username'] = $username;
                 $_SESSION['password'] = $password;
                 header("location: $cms_url/me");

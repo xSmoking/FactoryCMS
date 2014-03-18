@@ -1,6 +1,6 @@
 <?php
 include_once("./data-classes/data-classes-core-index.php");
-include_once("./sys_email_sender/class.phpmailer.php");
+include_once("./phpmailer/class.phpmailer.php");
 
 if(isset($_SESSION['username'])){
     header("Location:". $cms_url . "/me");
@@ -8,79 +8,57 @@ if(isset($_SESSION['username'])){
 }
 
 if ($_POST['action'] == "pass_send") {
-    $username = FilterText($_POST['username']);
-    $email = FilterText($_POST['mail']);
+    // Inicia a classe PHPMailer
+    $mail = new PHPMailer();
 
-    $sql = mysql_query("SELECT * FROM users WHERE username = '" . $username . "' AND mail = '" . $email . "'") or die(mysql_error());
-    if ((!$username) || (!$email)) {
-        $msg_type = "danger";
-        $msg_echo = "Preencha todos os campos.";
-    } elseif (mysql_num_rows($sql) > 0) {
-        $row2 = mysql_fetch_assoc($sql);
-        $caracters = 'abcdxywzABCDZYWZ0123456789';
-        $code = geraSenha();
-        $timestampend = time()+86400;
-        mysql_query("INSERT INTO password_recovery(username, mail, code, timestampend) VALUES('". $username ."','". $email ."','". $code ."', '". $timestampend ."')") or die(mysql_error());
-        
-        $mail = new PHPMailer();
-        $mail->SetLanguage('br');
-        $body = "
-            <html>
-            <head>
-            <meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1' />
-            <style type='text/css'>
-            a { color: #fc6204; }
-            </style>
-            </head>
-            <body style='background-color: #e3e3db; margin: 0; padding: 0; font-size: 11px; font-family: Verdana, Arial, Helvetica, sans-serif; color: #000;'>
-            <div style='background-color: #bce0ee; padding: 14px; border-bottom: 3px solid #000;'>	
-            <img src='" . $webgallery . "/v2/images/habbologo_whiteR.gif' alt='Forever Hotel' />
-            </div>
-            <div style='padding: 14px 14px 50px 14px; background-color: #e3e3db;'>	
-            <div style='background-color: #fff; padding: 14px; border: 1px solid #ccc'>
-            <h1 style='font-size: 16px'>Redefina sua senha no The Factory!</h1>
-            <br />
-            Ol&aacute; <b>" . $username . "</b>, recebemos uma solicitação de redefinição de senha vinda do IP <b>". $_SERVER['REMOTE_ADDR'] ."</b><br />
-            <br />Para redefinir sua senha, acesse o link abaixo:<br />
-            <a href='" . $cms_url . "/forgotpass_verify_" . $code . "'>" . $cms_url . "/forgotpass_verify_" . $code . "</a>
-            <br />
-            <br />Este é um e-mail de resposta automática, não o responda! 
-            <br />Caso tenha dúvida mande um e-mail para <b>contato@factoryhotel.com.br</b>
-            <br />
-            <br />
-            <br /><b>Equipe Factory</b>
-            <br />
-            <br /><h1 style='font-size: 10px'>Caso n&atilde;o tenha feito um pedido para altera&ccedil;&atilde;o de senha desconsidere essa mensagem ou entre em contato conosco.</h1>	
-            </div>	
-            </div>
-            </body>
-            </html>
-        ";
-        $mail->IsSMTP();
-        $mail->SMTPDebug = 0;
-        $mail->SMTPAuth = true;
-        $mail->SMTPSecure = "ssl";
-        $mail->Host = "smtp.gmail.com";
-        $mail->Port = 465;
-        $mail->Username = "joaocovaes@gmail.com";
-        $mail->Password = "1Px52b5i!";
-        $mail->SetFrom('joaocovaes@gmail.com', 'The Factory'); // e-mail do remetente e seu nome/apelido
-        $mail->AddReplyTo("joaocovaes@gmail.com", "The Factory"); // e-mail de resposta do e-mail que enviaremos. Ou seja, quando alguém responder a este e-mail, responderá para o e-mail aqui configurado ....e o nome/apelido do mesmo
-        $mail->Subject = "Redefinição de senha para The Factory"; // Assunto do e-mail
-        $mail->AltBody = "Para visualizar a mensagem, por favor, use um cliente de e-mail compatível/configurado para ver mensagens HTML!"; // Mensagem alternativa caso o destinat�rio. Veja o e-mail em um aplicativo sem suporte ou n�o configurado para ver mensagens HTML
-        $mail->MsgHTML($body);
-        $endereco = $email;
-        $mail->AddAddress($endereco, $endereco);
-        if (!$mail->Send()) {
-            $msg_type = "danger";
-            $msg_echo = "Houve um erro, tente novamente mais tarde.";
-        } else {
-            $msg_type = "success";
-            $msg_echo = "Foi enviado um link de redefinição de senha para seu e-mail.";
-        }
+    // Define os dados do servidor e tipo de conexão
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $mail->IsSMTP(); // Define que a mensagem será SMTP
+    //$mail->Host = "localhost"; // Endereço do servidor SMTP (caso queira utilizar a autenticação, utilize o host smtp.seudomínio.com.br)
+    $mail->SMTPAuth = true; // Usar autenticação SMTP (obrigatório para smtp.seudomínio.com.br)
+    $mail->Username = 'joaocovaes@gmail.com'; // Usuário do servidor SMTP (endereço de email)
+    $mail->Password = '1Px52b5i!'; // Senha do servidor SMTP (senha do email usado)
+
+    // Define o remetente
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $mail->From = "joaocovaes@gmail.com"; // Seu e-mail
+    $mail->Sender = "joaocovaes@gmail.com"; // Seu e-mail
+    $mail->FromName = "The Factory"; // Seu nome
+
+    // Define os destinatário(s)
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $mail->AddAddress('joaocovaes@gmail.com', 'Teste Locaweb');
+    $mail->AddAddress('joaocovaes@gmail.com');
+
+    // Define os dados técnicos da Mensagem
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $mail->IsHTML(true); // Define que o e-mail será enviado como HTML
+    $mail->CharSet = 'utf-8'; // Charset da mensagem (opcional)
+
+    // Define a mensagem (Texto e Assunto)
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $mail->Subject  = "Retrive Password"; // Assunto da mensagem
+    $mail->Body = 'Este é o corpo da mensagem de teste, em HTML! 
+     <IMG src="http://seudomínio.com.br/imagem.jpg" alt=":)"   class="wp-smiley"> ';
+    $mail->AltBody = 'Este é o corpo da mensagem de teste, em Texto Plano! \r\n 
+    <IMG src="http://seudomínio.com.br/imagem.jpg" alt=":)"  class="wp-smiley"> ';
+
+    // Envia o e-mail
+    $enviado = $mail->Send();
+
+    // Limpa os destinatários e os anexos
+    $mail->ClearAllRecipients();
+    $mail->ClearAttachments();
+
+    // Exibe uma mensagem de resultado
+    if ($enviado) {
+    echo "E-mail enviado com sucesso!";
     } else {
-        $msg_type = "danger";
-        $msg_echo = "Seu nome de usuário não conhecide com o e-mail.";
+    echo "Não foi possível enviar o e-mail.
+
+    ";
+    echo "Informações do erro: 
+    " . $mail->ErrorInfo;
     }
 }
 ?>

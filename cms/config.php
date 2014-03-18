@@ -23,19 +23,19 @@ if (isset($_POST['acc_config'])) {
             $msg_type = "danger";
             $msg = "Insira um e-mail válido.";
         } elseif (!empty($pass2)) {
-            mysql_query("UPDATE users SET mail='" . $mail . "', motto='" . $motto . "', password='" . $pass2h . "' WHERE id='" . $my_id . "'") or die(mysql_error());
+            $connect->query("UPDATE users SET mail='" . $mail . "', motto='" . $motto . "', password='" . $pass2h . "' WHERE id='" . $my_id . "'") or die($connect->error());
             $_SESSION['password'] = $pass2h;
             $msg_type = "success";
             $msg = "Configurações salvas com sucesso.";
         } else {
-            mysql_query("UPDATE users SET mail='" . $mail . "', motto='" . $motto . "' WHERE id='" . $my_id . "'") or die(mysql_error());
+            $connect->query("UPDATE users SET mail='" . $mail . "', motto='" . $motto . "' WHERE id='" . $my_id . "'") or die($connect->error());
             $msg_type = "success";
             $msg = "Configurações salvas com sucesso.";
         }
     }
 }
-$usersql = mysql_query("SELECT * FROM users WHERE username = '" . $myrow['username'] . "' LIMIT 1") or die(mysql_error());
-$myrow = mysql_fetch_assoc($usersql);
+$usersql = $connect->query("SELECT * FROM users WHERE username = '" . $myrow['username'] . "' LIMIT 1") or die($connect->error());
+$myrow = $usersql->fetch_assoc();
 ?>
 <title><?php echo $sitename; ?> - Configuração</title>
 <style>

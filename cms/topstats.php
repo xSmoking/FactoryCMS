@@ -19,8 +19,8 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $row = mysql_query("SELECT * FROM users WHERE rank < 5 ORDER BY credits DESC LIMIT 5");
-                                        while($sql = mysql_fetch_assoc($row)){
+                                        $row = $connect->query("SELECT * FROM users WHERE rank < 5 ORDER BY credits DESC LIMIT 5");
+                                        while($sql = $row->fetch_assoc()){
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -41,8 +41,8 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $row = mysql_query("SELECT * FROM users WHERE rank < 5 ORDER BY activity_points DESC LIMIT 5");
-                                        while($sql = mysql_fetch_assoc($row)){
+                                        $row = $connect->query("SELECT * FROM users WHERE rank < 5 ORDER BY activity_points DESC LIMIT 5");
+                                        while($sql = $row->fetch_assoc()){
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -63,9 +63,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM user_stats ORDER BY OnlineTime DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
-                                        $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5"));
+                                        $userstats_a = $connect->query("SELECT * FROM user_stats ORDER BY OnlineTime DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
+                                        $row2 = $connect->query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5");
+                                        $row = $row2->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -87,10 +88,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $pet = mysql_query("SELECT * FROM user_pets ORDER BY respect DESC LIMIT 5") or die(mysql_error());
-                                        while($sql = mysql_fetch_assoc($pet)){
-                                        $donosql = mysql_query("SELECT * FROM users WHERE id = '$sql[user_id]'") or die(mysql_error());
-                                        $dono = mysql_fetch_array($donosql);
+                                        $pet = $connect->query("SELECT * FROM user_pets ORDER BY respect DESC LIMIT 5") or die($connect->error());
+                                        while($sql = $pet->fetch_assoc()){
+                                        $donosql = $connect->query("SELECT * FROM users WHERE id = '$sql[user_id]'") or die($connect->error());
+                                        $dono = $donosql->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -111,11 +112,11 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $pet = mysql_query("SELECT * FROM user_stats ORDER BY RoomVisits DESC LIMIT 5") or die(mysql_error());
-                                        while($sql = mysql_fetch_assoc($pet)){
+                                        $pet = $connect->query("SELECT * FROM user_stats ORDER BY RoomVisits DESC LIMIT 5") or die($connect->error());
+                                        while($sql = $pet->fetch_assoc()){
 
-                                        $donosql = mysql_query("SELECT * FROM users WHERE id = '$sql[id]'") or die(mysql_error());
-                                        $dono = mysql_fetch_array($donosql);
+                                        $donosql = $connect->query("SELECT * FROM users WHERE id = '$sql[id]'") or die($connect->error());
+                                        $dono = $donosql->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -136,9 +137,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM user_stats ORDER BY GiftsGiven DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
-                                        $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5"));
+                                        $userstats_a = $connect->query("SELECT * FROM user_stats ORDER BY GiftsGiven DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
+                                        $row2 = $connect->query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5");
+                                        $row = $row2->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -159,9 +161,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM user_stats ORDER BY GiftsReceived DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
-                                        $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5"));
+                                        $userstats_a = $connect->query("SELECT * FROM user_stats ORDER BY GiftsReceived DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
+                                        $row2 = $connect->query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5");
+                                        $row = $row2->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -182,9 +185,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM user_stats ORDER BY AchievementScore DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
-                                        $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5"));
+                                        $userstats_a = $connect->query("SELECT * FROM user_stats ORDER BY AchievementScore DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
+                                        $row2 = $connect->query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5");
+                                        $row = $row2->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -205,9 +209,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM user_stats ORDER BY RespectGiven DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
-                                        $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5"));
+                                        $userstats_a = $connect->query("SELECT * FROM user_stats ORDER BY RespectGiven DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
+                                        $row2 = $connect->query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5");
+                                        $row = $row2->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -228,9 +233,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM user_stats ORDER BY Respect DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
-                                        $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5"));
+                                        $userstats_a = $connect->query("SELECT * FROM user_stats ORDER BY Respect DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
+                                        $row2 = $connect->query("SELECT * FROM users WHERE id = '".$userstats['id']."' LIMIT 5");
+                                        $row = $row2->fetch_assoc();
                                         ?>
                                         <tr>
                                             <td width="5px"></td>
@@ -251,9 +257,10 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                     <?php
-                                    $rooms = mysql_query("SELECT * FROM rooms ORDER BY score DESC LIMIT 5");
-                                    while($roominfo = mysql_fetch_assoc($rooms)){
-                                    $row = mysql_fetch_assoc($row = mysql_query("SELECT * FROM users WHERE username = '".$roominfo['owner']."' LIMIT 5"));
+                                    $rooms = $connect->query("SELECT * FROM rooms ORDER BY score DESC LIMIT 5");
+                                    while($roominfo = $rooms->fetch_assoc()){
+                                    $row2 = $connect->query("SELECT * FROM users WHERE username = '".$roominfo['owner']."' LIMIT 5");
+                                    $row = $row2->fetch_assoc();
                                     ?>
                                     <tr>
                                         <td width="5px"></td>
@@ -274,8 +281,8 @@ include_once("./templates/cms_header.php");
                                     </div>
                                     <table width="100%">
                                         <?php
-                                        $userstats_a = mysql_query("SELECT * FROM users ORDER BY vip_points DESC LIMIT 5");
-                                        while($userstats = mysql_fetch_assoc($userstats_a)){
+                                        $userstats_a = $connect->query("SELECT * FROM users ORDER BY vip_points DESC LIMIT 5");
+                                        while($userstats = $userstats_a->fetch_assoc()){
                                         ?>
                                         <tr>
                                             <td width="5px"></td>

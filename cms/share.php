@@ -35,8 +35,8 @@ include_once("./templates/cms_header_share.php");
                                             <a>
                                                 <span class="m-b-xs h4 block">
                                                 <?php
-                                                $ffsql = mysql_query("SELECT * FROM messenger_friendships WHERE user_one_id='". $myrow['id'] ."'") or die(mysql_error());
-                                                echo mysql_num_rows($ffsql);
+                                                $ffsql = $connect->query("SELECT * FROM messenger_friendships WHERE user_one_id='". $myrow['id'] ."'") or die($connect->error());
+                                                echo $ffsql->num_rows;
                                                 ?>
                                                 </span>
                                                 <small class="text-muted">Amigos</small>
@@ -48,8 +48,8 @@ include_once("./templates/cms_header_share.php");
                                     <small class="text-uc text-xs text-muted">emblemas</small>
                                     <p>
                                     <?php
-                                    $badges_active = mysql_query("SELECT * FROM user_badges WHERE user_id='". $myrow['id'] ."' AND badge_slot != '0'") or die(mysql_error());
-                                    while($badge = mysql_fetch_array($badges_active)){
+                                    $badges_active = $connect->query("SELECT * FROM user_badges WHERE user_id='". $myrow['id'] ."' AND badge_slot != '0'") or die($connect->error());
+                                    while($badge = $badges_active->fetch_assoc()){
                                         echo '<img src="'. $swf_patch .'/c_images/album1584/'. $badge['badge_id'] .'.gif" alt="" />';
                                     }
                                     ?>
@@ -88,13 +88,13 @@ include_once("./templates/cms_header_share.php");
                             if(isset($_GET['ac'])){
                                 if($_GET['ac'] == "delete" && isset($_GET['id'])){
                                     $feed_id = FilterText($_GET['id']);
-                                    $verify_sql = mysql_query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
-                                    $verify_row = mysql_fetch_array($verify_sql);
+                                    $verify_sql = $connect->query("SELECT * FROM cms_feed_news WHERE id='". $feed_id ."'") or die($connect->error());
+                                    $verify_row = $verify_sql->fetch_assoc();
                                     if($verify_row['user_id'] != $my_id){
                                         echo "<script type='text/javascript'>alert('Você não tem permissão para deletar este status.');</script>";
                                     }else{
-                                        mysql_query("DELETE FROM cms_feed_news WHERE id='". $feed_id ."'") or die(mysql_error());
-                                        mysql_query("DELETE FROM cms_feed_news_comments WHERE feed_id='". $feed_id ."'") or die(mysql_error());
+                                        $connect->query("DELETE FROM cms_feed_news WHERE id='". $feed_id ."'") or die($connect->error());
+                                        $connect->query("DELETE FROM cms_feed_news_comments WHERE feed_id='". $feed_id ."'") or die($connect->error());
                                         echo "<script type='text/javascript'>alert('Postagem apagada com sucesso!');</script>";
                                         echo '<meta http-equiv="refresh" content="0; url=home.php">';
                                         exit;
@@ -108,7 +108,7 @@ include_once("./templates/cms_header_share.php");
                                     if((!$texto)){
                                         echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar seus status.');</script>";
                                     }else{
-                                        mysql_query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('". $my_id ."', '". $texto ."', '". date("d/m") ."', '". date("H:i") ."')") or die(mysql_error());
+                                        $connect->query("INSERT INTO cms_feed_news(user_id, publication, date, hour) VALUES('". $my_id ."', '". $texto ."', '". date("d/m") ."', '". date("H:i") ."')") or die($connect->error());
                                         echo "<script type='text/javascript'>alert('Status compartilhado com sucesso!');</script>";
                                     }
                                 }elseif($_POST['action'] == "comment"){
@@ -117,7 +117,7 @@ include_once("./templates/cms_header_share.php");
                                     if((!$comment)){
                                         echo "<script type='text/javascript'>alert('Ocorreu algum erro ao postar o comentário.');</script>";
                                     }else{
-                                        mysql_query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('". $feed_id ."', '". $my_id ."', '". $comment ."')") or die(mysql_query());
+                                        $connect->query("INSERT INTO cms_feed_news_comments(feed_id, user_id, comment) VALUE('". $feed_id ."', '". $my_id ."', '". $comment ."')") or die($connect->query());
                                         echo "<script type='text/javascript'>alert('Comentário inserido!');</script>";
                                         echo '<meta http-equiv="refresh" content="0; url=home.php">';
                                         exit;
@@ -125,11 +125,11 @@ include_once("./templates/cms_header_share.php");
                                 }
                             }
                             
-                            $home_feed_sql  = mysql_query("SELECT * FROM cms_feed_news WHERE user_id='". $myrow['id'] ."' ORDER BY id DESC LIMIT 6") or die(mysql_error()); 
-                            while ($home_feed = mysql_fetch_array($home_feed_sql)) {
-                            $authorsql = mysql_query("SELECT * FROM users WHERE id='" . $home_feed['user_id'] . "'") or die(mysql_error());
-                            $author = mysql_fetch_array($authorsql);
-                            $comments = mysql_query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $home_feed['id'] . "'") or die(mysql_error());
+                            $home_feed_sql  = $connect->query("SELECT * FROM cms_feed_news WHERE user_id='". $myrow['id'] ."' ORDER BY id DESC LIMIT 6") or die($connect->error()); 
+                            while ($home_feed = $home_feed_sql->fetch_assoc()) {
+                            $authorsql = $connect->query("SELECT * FROM users WHERE id='" . $home_feed['user_id'] . "'") or die($connect->error());
+                            $author = $authorsql->fetch_assoc();
+                            $comments = $connect->query("SELECT * FROM cms_feed_news_comments WHERE feed_id='" . $home_feed['id'] . "'") or die($connect->error());
                             ?>
                             <div class="col-lg-6 col-sm-6 boxkatrix">
                               <section class="panel">                   
@@ -144,12 +144,13 @@ include_once("./templates/cms_header_share.php");
                                         <?php if($myrow['id'] == $my_id OR $myrow['rank'] > 3){ ?><small class="block text-muted"><a href="?ac=delete&id=<?php echo $home_feed['id']; ?>" style="color:red;">Deletar</a></small><?php } ?>
                                     </div></div>
                                     <p><?php echo $home_feed['publication']; ?></p>
-                                    <vercommentfeed<?php echo $home_feed['id']; ?>>Comentários (<?php echo mysql_num_rows($comments); ?>)</vercommentfeed<?php echo $home_feed['id']; ?>><br />
+                                    <vercommentfeed<?php echo $home_feed['id']; ?>>Comentários (<?php echo $comments->num_rows; ?>)</vercommentfeed<?php echo $home_feed['id']; ?>><br />
                                     <hiddenfeed<?php echo $home_feed['id']; ?> style="display:none;">
                                         <?php
-                                        if (mysql_num_rows($comments) > 0) {
-                                            while ($comment = mysql_fetch_array($comments)) {
-                                                $user_comment = mysql_fetch_array(mysql_query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'")) or die(mysql_error());
+                                        if ($comments->fetch_assoc() > 0) {
+                                            while ($comment = $comments->fetch_assoc()) {
+                                                $user_comment2 = $connect->query("SELECT * FROM users WHERE id='" . $comment['user_id'] . "'") or die($connect->error());
+                                                $user_comment = $user_comment2->fetch_assoc();
                                                 ?>
                                                 <div style='margin:10px;'>
                                                     <table>

@@ -3,7 +3,7 @@ include_once("./templates/cms_header.php");
 
 $group_id = FilterText($_GET['groupid']);
 
-$group_find = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or die(mysql_error());
+$group_find = $connect->query("SELECT * FROM groups WHERE id='". $group_id ."'") or die($connect->error());
 ?>
 <title><?php echo $sitename; ?> - Ver Grupo</title>
 <section>
@@ -14,26 +14,26 @@ $group_find = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or 
         <section class="scrollable wrapper">
             <div class="row">
                 <?php
-                if(mysql_num_rows($group_find) > 0){
-                    $group = mysql_fetch_assoc($group_find);
-                    $groupOwnerSQL = mysql_query("SELECT * FROM users WHERE id='". $group['ownerid'] ."'") or die(mysql_error());
-                    $groupOwnerInfo = mysql_fetch_assoc($groupOwnerSQL);
+                if($group_find->num_rows > 0){
+                    $group = $group_find->fetch_assoc();
+                    $groupOwnerSQL = $connect->query("SELECT * FROM users WHERE id='". $group['ownerid'] ."'") or die($connect->error());
+                    $groupOwnerInfo = $groupOwnerSQL->fetch_assoc();
                     
                     if($_GET['ac'] == "getin"){
-                        $checkMember = mysql_query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."' AND userid='". $my_id ."'") or die(mysql_error());
-                        if(mysql_num_rows($checkMember) > 0){
+                        $checkMember = $connect->query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."' AND userid='". $my_id ."'") or die($connect->error());
+                        if($checkMember->fetch_assoc() > 0){
                             echo "<script type='text/javascript'>alert('Você já é membro deste grupo.');</script>";
                         }else{
-                            mysql_query("INSERT INTO group_memberships(groupid, userid) VALUE('". $group_id ."', '". $my_id ."')") or die(mysql_error());
+                            $connect->query("INSERT INTO group_memberships(groupid, userid) VALUE('". $group_id ."', '". $my_id ."')") or die($connect->error());
                             echo "<script type='text/javascript'>alert('Pronto! Agora você é membro deste grupo');</script>";
                         }
                     }elseif($_GET['ac'] == "favorite"){
-                        $checkMember = mysql_query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."' AND userid='". $my_id ."'") or die(mysql_error());
-                        if(mysql_num_rows($checkMember) > 0){
+                        $checkMember = $connect->query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."' AND userid='". $my_id ."'") or die($connect->error());
+                        if($checkMember->fetch_assoc() > 0){
                             if($mystat['groupid'] == $group_id){
                                 echo "<script type='text/javascript'>alert('Este grupo já está marcado como favorito.');</script>";
                             }else{
-                                mysql_query("UPDATE user_stats SET groupid='". $group_id ."' WHERE id='". $my_id ."'") or die(mysql_error());
+                                $connect->query("UPDATE user_stats SET groupid='". $group_id ."' WHERE id='". $my_id ."'") or die($connect->error());
                                 echo "<script type='text/javascript'>alert('Pronto! Este grupo foi marcado como seu favorito.');</script>";
                             }
                         }else{
@@ -41,9 +41,9 @@ $group_find = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or 
                         }
                     }
 
-                    $user_stats_sql = mysql_query("SELECT * FROM user_stats WHERE id='". $myrow['id'] ."'") or die(mysql_error());
-                    $mystat = mysql_fetch_assoc($user_stats_sql);
-                    $checkUserMember = mysql_query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."' AND userid='". $my_id ."'") or die(mysql_error());
+                    $user_stats_sql = $connect->query("SELECT * FROM user_stats WHERE id='". $myrow['id'] ."'") or die($connect->error());
+                    $mystat = $user_stats_sql->fetch_assoc();
+                    $checkUserMember = $connect->query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."' AND userid='". $my_id ."'") or die($connect->error());
                 ?>
                 <div class="col-lg-8">
                     <div class="row">
@@ -53,9 +53,9 @@ $group_find = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or 
                                     <img src="<?php echo $cms_url; ?>/habbo-imaging/badge-fill/<?php echo $group['badge']; ?>.gif" style="float:right;" />
                                     <div class="font-thin" style="font-size:20px; margin-bottom:10px;"><?php echo $group['name']; ?></div>
                                     <?php
-                                    $groups = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or die(mysql_error());
-                                    while ($row = mysql_fetch_array($groups)) {
-                                        $members2 = mysql_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $row['id'] . "'") or die(mysql_error());
+                                    $groups = $connect->query("SELECT * FROM groups WHERE id='". $group_id ."'") or die($connect->error());
+                                    while ($row = $groups->fetch_assoc()) {
+                                        $members2 = mysqli_evaluate("SELECT COUNT(*) FROM group_memberships WHERE groupid = '" . $row['id'] . "'");
                                     ?>
                                         <b>Proprietário:</b> <?php echo $groupOwnerInfo['username']; ?><br />
                                         <b>Criado em:</b> <?php echo $group['created']; ?><br />
@@ -72,10 +72,10 @@ $group_find = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or 
                                 <div class="panel-body">
                                     <div class="font-thin" style="font-size:20px; margin-bottom:10px;">Membros</div>
                                     <?php
-                                    $groupMembers = mysql_query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."'") or die(mysql_error());
-                                    while ($row = mysql_fetch_array($groupMembers)) {
-                                        $membersInfo = mysql_query("SELECT * FROM users WHERE id='". $row['userid'] ."'") or die(mysql_error());
-                                        $memberInfo = mysql_fetch_assoc($membersInfo);
+                                    $groupMembers = $connect->query("SELECT * FROM group_memberships WHERE groupid='". $group_id ."'") or die($connect->error());
+                                    while ($row = $groupMembers->fetch_assoc()) {
+                                        $membersInfo = $connect->query("SELECT * FROM users WHERE id='". $row['userid'] ."'") or die($connect->error());
+                                        $memberInfo = $membersInfo->fetch_assoc();
                                     ?>
                                     <a href="<?php echo $cms_url; ?>/home-<?php echo $memberInfo['username']; ?>" data-toggle="tooltip" title="<?php echo $memberInfo['username']; ?>" class="thumb-sm pull-left m-r">
                                         <div style="background:url(http://www.habbo.co.uk/habbo-imaging/avatarimage?figure=<?php echo $memberInfo['look']; ?>&size=b&direction=2&head_direction=2&action=wlk&gesture=n&size=n) -10px -14px; width:40px; height:45px;"></div>
@@ -96,7 +96,7 @@ $group_find = mysql_query("SELECT * FROM groups WHERE id='". $group_id ."'") or 
                                 <table style="width:100%; font-size:14px;" class="table-hover" cellpadding="10">
                                     <tr>
                                         <td><a href="group_view.php?groupid=<?php echo $group_id; ?>&ac=getin">Entrar no Grupo</a></td>
-                                        <td><img style="float:right;" src="./web-gallery/images/group_enter<?php if(mysql_num_rows($checkUserMember) > 0){ echo "_hover"; } ?>.png" /></td>
+                                        <td><img style="float:right;" src="./web-gallery/images/group_enter<?php if($checkUserMember->num_rows > 0){ echo "_hover"; } ?>.png" /></td>
                                     </tr>
                                     <tr>
                                         <td><a href="group_view.php?groupid=<?php echo $group_id; ?>&ac=favorite">Marcar grupo como favorito</a></td>
